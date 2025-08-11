@@ -9,45 +9,39 @@
     <meta name="description" content="Guia de bolso para instalações comerciais de GLP da Ultragaz">
     <meta name="theme-color" content="#2563eb">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Ultragaz">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <!-- Ícone embutido como base64 -->
-    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzI1NjNlYiIvPgo8dGV4dCB4PSIxNiIgeT0iMjIiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE0IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5VRzwvdGV4dD4KPC9zdmc+">
+    <!-- Ícone -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%232563eb'/%3E%3Ctext x='96' y='120' text-anchor='middle' font-size='80' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Previne zoom em inputs no iOS */
-        input[type="text"], input[type="number"], select, textarea {
-            font-size: 16px;
+        /* Remove qualquer indicação de browser */
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
-        /* Estilo para scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
+        input, select {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+
+        body {
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #2563eb;
-            border-radius: 2px;
-        }
-        
-        /* Animações */
-        .fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Splash screen */
+
         .splash-screen {
             position: fixed;
             top: 0;
@@ -72,24 +66,17 @@
             50% { transform: scale(1.1); }
         }
 
-        /* PWA Install Button */
-        .install-prompt {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: #2563eb;
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
-            transform: translateY(100px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
+        .screen {
+            display: none;
         }
-        
-        .install-prompt.show {
-            transform: translateY(0);
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Prevent zoom on iOS */
+        input[type="text"], input[type="number"], select, textarea {
+            font-size: 16px;
         }
     </style>
 </head>
@@ -108,127 +95,580 @@
         </div>
     </div>
 
-    <!-- Install Prompt -->
-    <div id="install-prompt" class="install-prompt">
-        <div class="flex items-center justify-between">
-            <div class="flex-1">
-                <h3 class="font-semibold text-sm">📱 Instalar App</h3>
-                <p class="text-xs text-blue-200 mt-1">Adicione à tela inicial para acesso rápido</p>
+    <!-- App Container -->
+    <div id="app" style="display: none;">
+        <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+            
+            <!-- Home Screen -->
+            <div id="home-screen" class="screen active flex-1">
+                <!-- Header -->
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <h1 class="text-lg font-bold flex-1">Ultragaz - Guia Técnico</h1>
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                        <span class="text-blue-600 text-xs font-bold">UG</span>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="p-4 bg-gray-50">
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400">🔍</span>
+                        <input type="text" placeholder="Buscar informações..." 
+                               class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="flex-1 p-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Vasilhames -->
+                        <button onclick="showScreen('vasilhames-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+                            <div class="text-blue-600 mb-2 text-2xl">🏗️</div>
+                            <h3 class="font-semibold text-gray-800">Vasilhames</h3>
+                            <p class="text-sm text-gray-600 mt-1">B190 e B125</p>
+                        </button>
+
+                        <!-- Calculadora -->
+                        <button onclick="showScreen('calculator-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow">
+                            <div class="text-green-600 mb-2 text-2xl">🧮</div>
+                            <h3 class="font-semibold text-gray-800">Calculadora</h3>
+                            <p class="text-sm text-gray-600 mt-1">Dimensionamento</p>
+                        </button>
+
+                        <!-- Distâncias -->
+                        <button onclick="showScreen('distances-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 hover:shadow-lg transition-shadow">
+                            <div class="text-orange-600 mb-2 text-2xl">📏</div>
+                            <h3 class="font-semibold text-gray-800">Distâncias</h3>
+                            <p class="text-sm text-gray-600 mt-1">Por estado</p>
+                        </button>
+
+                        <!-- Normas -->
+                        <button onclick="showScreen('norms-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
+                            <div class="text-purple-600 mb-2 text-2xl">📋</div>
+                            <h3 class="font-semibold text-gray-800">Normas</h3>
+                            <p class="text-sm text-gray-600 mt-1">NBR e ITs</p>
+                        </button>
+                    </div>
+
+                    <!-- Quick Access -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">Acesso Rápido</h3>
+                        <div class="space-y-2">
+                            <button onclick="showScreen('safety-screen')" class="w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100">
+                                <span class="text-blue-600 font-medium">⚠️ Segurança</span>
+                                <p class="text-sm text-gray-600">Procedimentos obrigatórios</p>
+                            </button>
+                            <button onclick="showScreen('investment-screen')" class="w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100">
+                                <span class="text-green-600 font-medium">💰 Investimento</span>
+                                <p class="text-sm text-gray-600">Análise de custos</p>
+                            </button>
+                            <button onclick="showScreen('faq-screen')" class="w-full text-left p-3 hover:bg-gray-50 rounded">
+                                <span class="text-orange-600 font-medium">❓ FAQ</span>
+                                <p class="text-sm text-gray-600">Dúvidas frequentes</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="dismissInstall()" class="px-3 py-1 text-xs bg-blue-400 rounded">Depois</button>
-                <button onclick="installApp()" class="px-3 py-1 text-xs bg-white text-blue-600 rounded font-semibold">Instalar</button>
+
+            <!-- Vasilhames Screen -->
+            <div id="vasilhames-screen" class="screen flex-1">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Características dos Vasilhames</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- B190 -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold text-lg">B190</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800">Vasilhame B190</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Diâmetro</span>
+                                    <p class="text-lg font-semibold text-gray-800">76,18 cm</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Altura</span>
+                                    <p class="text-lg font-semibold text-gray-800">131,9 cm</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Vazão</span>
+                                    <p class="text-lg font-semibold text-blue-600">03 kg/h</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Tara Média</span>
+                                    <p class="text-lg font-semibold text-gray-800">145 kg</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Capacidade GLP</span>
+                                    <p class="text-lg font-semibold text-green-600">190 kg</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Cap. Volumétrica</span>
+                                    <p class="text-lg font-semibold text-gray-800">452 L</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- B125 -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold text-lg">B125</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800">Vasilhame B125</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Diâmetro</span>
+                                    <p class="text-lg font-semibold text-gray-800">61,0 cm</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Altura</span>
+                                    <p class="text-lg font-semibold text-gray-800">133,7 cm</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Vazão</span>
+                                    <p class="text-lg font-semibold text-blue-600">02,5 kg/h</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Tara Média</span>
+                                    <p class="text-lg font-semibold text-gray-800">100 kg</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Capacidade GLP</span>
+                                    <p class="text-lg font-semibold text-green-600">125 kg</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-600">Cap. Volumétrica</span>
+                                    <p class="text-lg font-semibold text-gray-800">300 L</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                        <h4 class="font-semibold text-blue-800 mb-2">💡 Dica Importante</h4>
+                        <p class="text-blue-700 text-sm">
+                            O B190 tem vazão de 3kg/h, ideal para estabelecimentos com maior consumo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Screen -->
+            <div id="calculator-screen" class="screen flex-1">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Calculadora de Dimensionamento</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Resultado -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">Resultado do Dimensionamento</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-blue-50 rounded">
+                                <p class="text-2xl font-bold text-blue-600" id="consumo-total">0.0</p>
+                                <p class="text-sm text-gray-600">kg/h Total</p>
+                            </div>
+                            <div class="text-center p-3 bg-green-50 rounded">
+                                <p class="text-2xl font-bold text-green-600" id="tanques-necessarios">0</p>
+                                <p class="text-sm text-gray-600">B190 Necessários</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 p-3 bg-orange-50 rounded">
+                            <p class="text-sm text-orange-700">
+                                <strong>Consumo mensal:</strong> <span id="consumo-mensal">0</span> kg (<span id="horas-uso">8</span>h/dia × <span id="dias-mes">30</span> dias)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Configurações -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">Configurações de Uso</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600">Horas/dia</label>
+                                <input type="number" id="input-horas" value="8" onchange="updateCalculation()" 
+                                       class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600">Dias/mês</label>
+                                <input type="number" id="input-dias" value="30" onchange="updateCalculation()" 
+                                       class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipamentos Selecionados -->
+                    <div id="equipamentos-selecionados" class="bg-white rounded-lg shadow-md p-4" style="display: none;">
+                        <h3 class="font-semibold text-gray-800 mb-3">Equipamentos Selecionados</h3>
+                        <div id="lista-equipamentos" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Adicionar Equipamentos -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">Adicionar Equipamentos</h3>
+                        <div class="space-y-2">
+                            <button onclick="addEquipment('Fogão duas bocas (Portátil)', 0.34)" 
+                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium text-sm">Fogão duas bocas (Portátil)</p>
+                                        <p class="text-xs text-gray-600">2.9 kW</p>
+                                    </div>
+                                    <span class="text-blue-600 font-semibold">0.34 kg/h</span>
+                                </div>
+                            </button>
+                            <button onclick="addEquipment('Fogão quatro bocas (Sem forno)', 0.95)" 
+                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium text-sm">Fogão quatro bocas (Sem forno)</p>
+                                        <p class="text-xs text-gray-600">8.1 kW</p>
+                                    </div>
+                                    <span class="text-blue-600 font-semibold">0.95 kg/h</span>
+                                </div>
+                            </button>
+                            <button onclick="addEquipment('Fogão quatro bocas (Com forno)', 1.27)" 
+                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium text-sm">Fogão quatro bocas (Com forno)</p>
+                                        <p class="text-xs text-gray-600">10.8 kW</p>
+                                    </div>
+                                    <span class="text-blue-600 font-semibold">1.27 kg/h</span>
+                                </div>
+                            </button>
+                            <button onclick="addEquipment('Fritadeira comercial', 1.5)" 
+                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium text-sm">Fritadeira comercial</p>
+                                        <p class="text-xs text-gray-600">12.8 kW</p>
+                                    </div>
+                                    <span class="text-blue-600 font-semibold">1.5 kg/h</span>
+                                </div>
+                            </button>
+                            <button onclick="addEquipment('Forno de parede', 0.41)" 
+                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium text-sm">Forno de parede</p>
+                                        <p class="text-xs text-gray-600">3.5 kW</p>
+                                    </div>
+                                    <span class="text-blue-600 font-semibold">0.41 kg/h</span>
+                                </div>
+                            </button>
+                            <button onclick="addEquipment('Aquecedor 6 L/min', 1.23)" 
+                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="font-medium text-sm">Aquecedor 6 L/min</p>
+                                        <p class="text-xs text-gray-600">10.5 kW</p>
+                                    </div>
+                                    <span class="text-blue-600 font-semibold">1.23 kg/h</span>
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <button onclick="clearCalculator()" 
+                                class="mt-4 w-full bg-gray-500 text-white py-2 rounded hover:bg-gray-600">
+                            Limpar Calculadora
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distances Screen -->
+            <div id="distances-screen" class="screen flex-1">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Distanciamentos - Central em Nicho</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Seletor de Estado -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">Selecionar Estado/Norma</h3>
+                        <select id="state-selector" onchange="updateDistances()" 
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="NBR 13523">NBR 13523</option>
+                            <option value="SP">São Paulo (SP)</option>
+                            <option value="RJ">Rio de Janeiro (RJ)</option>
+                            <option value="PR">Paraná (PR)</option>
+                            <option value="ES">Espírito Santo (ES)</option>
+                            <option value="MS">Mato Grosso do Sul (MS)</option>
+                            <option value="GO">Goiás (GO)</option>
+                            <option value="PA">Pará (PA)</option>
+                        </select>
+                    </div>
+
+                    <!-- Distâncias -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-gray-800">Distâncias Mínimas (metros)</h3>
+                            <span id="current-state" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm font-medium">
+                                NBR 13523
+                            </span>
+                        </div>
+                        
+                        <div class="space-y-3" id="distances-list">
+                            <!-- Será preenchido pelo JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Informações Específicas -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">Informações Específicas</h3>
+                        <div class="p-3 bg-green-50 rounded">
+                            <p class="text-sm font-medium text-green-800">Máximo de tanques permitidos</p>
+                            <p class="text-lg font-bold text-green-600" id="max-tanks">2 B190/B125</p>
+                        </div>
+                        
+                        <div id="state-warnings" class="mt-2">
+                            <!-- Avisos específicos por estado -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Norms Screen -->
+            <div id="norms-screen" class="screen flex-1">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Normas e Legislações</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-blue-600 mb-3">📋 ABNT - Normas Técnicas</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">NBR 13523</p>
+                                <p class="text-sm text-gray-600">Central de gás liquefeito de petróleo - GLP</p>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">NBR 14024</p>
+                                <p class="text-sm text-gray-600">Central de GLP - Sistema de abastecimento a granel</p>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">NBR 15358</p>
+                                <p class="text-sm text-gray-600">Rede de distribuição interna para uso não residencial</p>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">NBR 15526</p>
+                                <p class="text-sm text-gray-600">Redes de distribuição interna para instalações residenciais</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-orange-600 mb-3">🏛️ Legislações Federais</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">ANP 18/2004</p>
+                                <p class="text-sm text-gray-600">Especificação do GLP</p>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">ANP 47/1999</p>
+                                <p class="text-sm text-gray-600">Sistema de Abastecimento de GLP à granel</p>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">ANP 49/2016</p>
+                                <p class="text-sm text-gray-600">Distribuidoras de GLP</p>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <p class="font-semibold text-gray-800">NRs</p>
+                                <p class="text-sm text-gray-600">Normas Regulamentadoras - Ministério do Trabalho</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                        <h4 class="font-semibold text-blue-800 mb-2">⚠️ Hierarquia de Normas</h4>
+                        <p class="text-blue-700 text-sm">
+                            <strong>Prioridade:</strong> 1º Instruções do Corpo de Bombeiros, 2º Procedimentos Ultragaz, 3º NBRs
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safety Screen -->
+            <div id="safety-screen" class="screen flex-1">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Segurança - Procedimentos</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div class="bg-blue-600 text-white rounded-lg p-4">
+                        <h3 class="font-bold text-lg mb-2">🛡️ SEGURANÇA COMO VALOR PRIMORDIAL</h3>
+                        <p class="text-sm">
+                            A instalação em conformidade com as normas vigentes minimiza riscos e garante a segurança das instalações.
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-blue-600 mb-3">⚠️ Riscos de Não Conformidade</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                                <span class="text-xl mr-3">💥</span>
+                                <span class="text-blue-700 font-medium">Risco de acidentes</span>
+                            </div>
+                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                                <span class="text-xl mr-3">🚫</span>
+                                <span class="text-blue-700 font-medium">Risco de não pagamento do seguro</span>
+                            </div>
+                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                                <span class="text-xl mr-3">🚨</span>
+                                <span class="text-blue-700 font-medium">Risco de interdição pelo Corpo de Bombeiros</span>
+                            </div>
+                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
+                                <span class="text-xl mr-3">⛔</span>
+                                <span class="text-blue-700 font-medium">Risco de não abastecimento pela Logística</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investment Screen -->
+            <div id="investment-screen" class="screen flex-1">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Análise de Investimento</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div class="bg-blue-600 text-white rounded-lg p-4">
+                        <h3 class="font-bold text-lg mb-2">💰 Composição do Investimento</h3>
+                        <p class="text-sm">
+                            Para geração dos valores da OS, os kits devem ser lançados corretamente no Salesforce.
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <h3 class="font-semibold text-gray-800 mb-3">📦 Kits Principais</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <h4 class="font-semibold text-blue-600 mb-2">Kit Central</h4>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• Custo do Projeto da Central</li>
+                                    <li>• Material para montagem até saída do 1º estágio</li>
+                                    <li>• Mão de obra para montagem mecânica</li>
+                                    <li>• Frete para entrega do vasilhame</li>
+                                </ul>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <h4 class="font-semibold text-blue-600 mb-2">Kit Rede Completo</h4>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• Material e mão de obra por metro de rede</li>
+                                    <li>• Lançar quantidade correta em metros</li>
+                                </ul>
+                            </div>
+                            <div class="p-3 border border-gray-200 rounded-lg">
+                                <h4 class="font-semibold text-blue-600 mb-2">Kit Abrigo Completo</h4>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• Abrigo pré-moldado</li>
+                                    <li>• Mão de obra para montagem</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Screen -->
+            <div id="faq-screen" class="screen flex-1">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Dúvidas Frequentes</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <details class="group">
+                            <summary class="flex justify-between items-center cursor-pointer">
+                                <h3 class="font-semibold text-gray-800 pr-4">Pode ser finalizada instalação com OS parcialmente aprovada?</h3>
+                                <span class="text-blue-600 group-open:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <p class="text-gray-700 text-sm">Não. Neste status não é possível realizar pagamento dos prestadores nem existe Base Instalada para NF de comodato.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <details class="group">
+                            <summary class="flex justify-between items-center cursor-pointer">
+                                <h3 class="font-semibold text-gray-800 pr-4">Quais condições obrigatórias para montagem?</h3>
+                                <span class="text-blue-600 group-open:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <p class="text-gray-700 text-sm">OS deve estar 'Aprovada' no Oracle PM, Projeto/croqui validado tecnicamente e OS com saldo suficiente.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <details class="group">
+                            <summary class="flex justify-between items-center cursor-pointer">
+                                <h3 class="font-semibold text-gray-800 pr-4">Posso solicitar visita de projeto sem OS?</h3>
+                                <span class="text-blue-600 group-open:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <p class="text-gray-700 text-sm">Sim, é possível. Porém, caso o negócio não seja fechado, o custo será lançado em despesa comercial.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bg-white border-t border-gray-200 px-4 py-2">
+                <div class="flex justify-around">
+                    <button onclick="showScreen('home-screen')" class="flex flex-col items-center py-2 px-3 rounded text-blue-600">
+                        <div class="text-xl">🏠</div>
+                        <span class="text-xs mt-1">Início</span>
+                    </button>
+                    <button onclick="showScreen('calculator-screen')" class="flex flex-col items-center py-2 px-3 rounded text-gray-400">
+                        <div class="text-xl">🧮</div>
+                        <span class="text-xs mt-1">Calc</span>
+                    </button>
+                    <button onclick="showScreen('distances-screen')" class="flex flex-col items-center py-2 px-3 rounded text-gray-400">
+                        <div class="text-xl">📏</div>
+                        <span class="text-xs mt-1">Dist.</span>
+                    </button>
+                    <button onclick="showScreen('norms-screen')" class="flex flex-col items-center py-2 px-3 rounded text-gray-400">
+                        <div class="text-xl">📋</div>
+                        <span class="text-xs mt-1">Normas</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- App Container -->
-    <div id="app" style="display: none;"></div>
-
-    <!-- React -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
     <script>
-        // PWA Variables
-        let deferredPrompt;
-        let isInstalled = false;
-
-        // Check if app is already installed
-        window.addEventListener('appinstalled', () => {
-            isInstalled = true;
-            document.getElementById('install-prompt').style.display = 'none';
-        });
-
-        // Capture install prompt
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install prompt after app loads
-            setTimeout(() => {
-                if (!isInstalled) {
-                    document.getElementById('install-prompt').classList.add('show');
-                }
-            }, 3000);
-        });
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('App instalado!');
-                    }
-                    deferredPrompt = null;
-                    dismissInstall();
-                });
-            } else {
-                // Fallback para Safari/iOS
-                alert('Para instalar:\n\nSafari: Toque em Compartilhar → Adicionar à Tela de Início\nChrome: Menu → Adicionar à tela inicial');
-            }
-        }
-
-        function dismissInstall() {
-            document.getElementById('install-prompt').classList.remove('show');
-        }
-
-        // Service Worker (inline)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swCode = `
-                    const CACHE_NAME = 'ultragaz-v1';
-                    const urlsToCache = ['/'];
-                    
-                    self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(urlsToCache))
-                        );
-                    });
-                    
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request)
-                                .then(response => response || fetch(event.request))
-                        );
-                    });
-                `;
-                
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(() => console.log('SW registrado'))
-                    .catch(err => console.log('SW erro:', err));
-            });
-        }
-
-        // React App
-        const { useState, createElement: h } = React;
-
-        // Dados dos vasilhames
-        const vasilhamesData = {
-            B190: {
-                diametro: '76,18 cm',
-                altura: '131,9 cm',
-                vazao: '03 kg/h',
-                taraMédia: '145 kg',
-                capacidadeGas: '190 kg',
-                capacidadeVolumetrica: '452 L'
-            },
-            B125: {
-                diametro: '61,0 cm',
-                altura: '133,7 cm',
-                vazao: '02,5 kg/h',
-                taraMédia: '100 kg',
-                capacidadeGas: '125 kg',
-                capacidadeVolumetrica: '300 L'
-            }
-        };
+        // App State
+        let equipamentos = [];
+        let consumoTotal = 0;
 
         // Dados de distanciamento por estado
-        const distanciamentosNicho = {
+        const distanciamentosData = {
             'NBR 13523': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
             'SP': { portas: 1.5, materiais: 1.5, ignição: 1.5, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
             'RJ': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
@@ -239,547 +679,196 @@
             'PA': { portas: 0, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 }
         };
 
-        // Lista de aparelhos
-        const aparelhos = [
-            { nome: 'Fogão duas bocas (Portátil)', potencia: 2.9, consumo: 0.34 },
-            { nome: 'Fogão duas bocas (De bancada)', potencia: 3.6, consumo: 0.42 },
-            { nome: 'Fogão quatro bocas (Sem forno)', potencia: 8.1, consumo: 0.95 },
-            { nome: 'Fogão quatro bocas (Com forno)', potencia: 10.8, consumo: 1.27 },
-            { nome: 'Fogão cinco bocas (Sem forno)', potencia: 11.6, consumo: 1.36 },
-            { nome: 'Fogão cinco bocas (Com forno)', potencia: 15.6, consumo: 1.83 },
-            { nome: 'Fogão seis bocas (Sem forno)', potencia: 11.6, consumo: 1.36 },
-            { nome: 'Fogão seis bocas (Com forno)', potencia: 15.6, consumo: 1.83 },
-            { nome: 'Forno de parede', potencia: 3.5, consumo: 0.41 },
-            { nome: 'Fritadeira comercial', potencia: 12.8, consumo: 1.5 },
-            { nome: 'Aquecedor 6 L/min', potencia: 10.5, consumo: 1.23 },
-            { nome: 'Aquecedor 8 L/min', potencia: 14, consumo: 1.64 },
-            { nome: 'Aquecedor 10-12 L/min', potencia: 20.9, consumo: 2.45 },
-            { nome: 'Secadora de roupa', potencia: 7, consumo: 0.82 }
+        const distanceLabels = [
+            { key: 'portas', label: 'Portas e janelas', icon: '🚪' },
+            { key: 'materiais', label: 'Materiais combustíveis', icon: '📦' },
+            { key: 'ignição', label: 'Pontos de ignição', icon: '⚡' },
+            { key: 'passeio', label: 'Passeio público', icon: '🚶' },
+            { key: 'chama', label: 'Chama aberta', icon: '🔥' },
+            { key: 'captação', label: 'Captação de ar forçado', icon: '🌪️' },
+            { key: 'produtos', label: 'Produtos tóxicos/inflamáveis', icon: '☠️' },
+            { key: 'gerador', label: 'Gerador a diesel', icon: '⚙️' },
+            { key: 'outras', label: 'Outras centrais GLP', icon: '🏭' }
         ];
 
-        function App() {
-            const [currentScreen, setCurrentScreen] = useState('home');
-            const [searchTerm, setSearchTerm] = useState('');
-
-            const Header = ({ title, showBack = false }) => h('div', 
-                { className: 'bg-blue-600 text-white p-4 flex items-center shadow-lg' },
-                showBack && h('button', {
-                    onClick: () => setCurrentScreen('home'),
-                    className: 'mr-3 p-1 hover:bg-blue-700 rounded text-xl'
-                }, '←'),
-                h('h1', { className: 'text-lg font-bold flex-1' }, title),
-                h('div', { className: 'w-8 h-8 bg-white rounded-full flex items-center justify-center' },
-                    h('span', { className: 'text-blue-600 text-xs font-bold' }, 'UG')
-                )
-            );
-
-            const SearchBar = () => h('div', { className: 'p-4 bg-gray-50' },
-                h('div', { className: 'relative' },
-                    h('span', { className: 'absolute left-3 top-3 text-gray-400' }, '🔍'),
-                    h('input', {
-                        type: 'text',
-                        placeholder: 'Buscar informações...',
-                        value: searchTerm,
-                        onChange: (e) => setSearchTerm(e.target.value),
-                        className: 'w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-                    })
-                )
-            );
-
-            const HomeScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                Header({ title: 'Ultragaz - Guia Técnico' }),
-                SearchBar(),
-                h('div', { className: 'flex-1 p-4 space-y-4' },
-                    h('div', { className: 'grid grid-cols-2 gap-4' },
-                        h('button', {
-                            onClick: () => setCurrentScreen('vasilhames'),
-                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow'
-                        },
-                            h('div', { className: 'text-blue-600 mb-2 text-2xl' }, '🏗️'),
-                            h('h3', { className: 'font-semibold text-gray-800' }, 'Vasilhames'),
-                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'B190 e B125')
-                        ),
-                        h('button', {
-                            onClick: () => setCurrentScreen('calculator'),
-                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow'
-                        },
-                            h('div', { className: 'text-green-600 mb-2 text-2xl' }, '🧮'),
-                            h('h3', { className: 'font-semibold text-gray-800' }, 'Calculadora'),
-                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'Dimensionamento')
-                        ),
-                        h('button', {
-                            onClick: () => setCurrentScreen('distances'),
-                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 hover:shadow-lg transition-shadow'
-                        },
-                            h('div', { className: 'text-orange-600 mb-2 text-2xl' }, '📏'),
-                            h('h3', { className: 'font-semibold text-gray-800' }, 'Distâncias'),
-                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'Por estado')
-                        ),
-                        h('button', {
-                            onClick: () => setCurrentScreen('norms'),
-                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow'
-                        },
-                            h('div', { className: 'text-purple-600 mb-2 text-2xl' }, '📋'),
-                            h('h3', { className: 'font-semibold text-gray-800' }, 'Normas'),
-                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'NBR e ITs')
-                        )
-                    ),
-                    h('div', { className: 'bg-white rounded-lg shadow-md p-4 mt-6' },
-                        h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Acesso Rápido'),
-                        h('div', { className: 'space-y-2' },
-                            h('button', {
-                                onClick: () => setCurrentScreen('safety'),
-                                className: 'w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100'
-                            },
-                                h('span', { className: 'text-blue-600 font-medium' }, '⚠️ Segurança'),
-                                h('p', { className: 'text-sm text-gray-600' }, 'Procedimentos obrigatórios')
-                            ),
-                            h('button', {
-                                onClick: () => setCurrentScreen('investment'),
-                                className: 'w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100'
-                            },
-                                h('span', { className: 'text-green-600 font-medium' }, '💰 Investimento'),
-                                h('p', { className: 'text-sm text-gray-600' }, 'Análise de custos')
-                            ),
-                            h('button', {
-                                onClick: () => setCurrentScreen('faq'),
-                                className: 'w-full text-left p-3 hover:bg-gray-50 rounded'
-                            },
-                                h('span', { className: 'text-orange-600 font-medium' }, '❓ FAQ'),
-                                h('p', { className: 'text-sm text-gray-600' }, 'Dúvidas frequentes')
-                            )
-                        )
-                    )
-                )
-            );
-
-            const VasilhamesScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                Header({ title: 'Características dos Vasilhames', showBack: true }),
-                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
-                    Object.entries(vasilhamesData).map(([tipo, dados]) =>
-                        h('div', { key: tipo, className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('div', { className: 'flex items-center mb-4' },
-                                h('div', { className: 'w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3' },
-                                    h('span', { className: 'text-blue-600 font-bold text-lg' }, tipo)
-                                ),
-                                h('h3', { className: 'text-lg font-semibold text-gray-800' }, `Vasilhame ${tipo}`)
-                            ),
-                            h('div', { className: 'grid grid-cols-2 gap-4' },
-                                h('div', { className: 'space-y-3' },
-                                    h('div', {},
-                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Diâmetro'),
-                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.diametro)
-                                    ),
-                                    h('div', {},
-                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Altura'),
-                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.altura)
-                                    ),
-                                    h('div', {},
-                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Vazão'),
-                                        h('p', { className: 'text-lg font-semibold text-blue-600' }, dados.vazao)
-                                    )
-                                ),
-                                h('div', { className: 'space-y-3' },
-                                    h('div', {},
-                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Tara Média'),
-                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.taraMédia)
-                                    ),
-                                    h('div', {},
-                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Capacidade GLP'),
-                                        h('p', { className: 'text-lg font-semibold text-green-600' }, dados.capacidadeGas)
-                                    ),
-                                    h('div', {},
-                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Cap. Volumétrica'),
-                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.capacidadeVolumetrica)
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    h('div', { className: 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded' },
-                        h('h4', { className: 'font-semibold text-blue-800 mb-2' }, '💡 Dica Importante'),
-                        h('p', { className: 'text-blue-700 text-sm' },
-                            'O B190 tem vazão de 3kg/h, ideal para estabelecimentos com maior consumo. Para dimensionamento correto, use a calculadora considerando o consumo total dos equipamentos.'
-                        )
-                    )
-                )
-            );
-
-            const CalculatorScreen = () => {
-                const [equipamentos, setEquipamentos] = useState([]);
-                const [horasUso, setHorasUso] = useState(8);
-                const [diasMes, setDiasMes] = useState(30);
-
-                const consumoTotal = equipamentos.reduce((total, eq) => total + eq.consumo, 0);
-                const consumoMensal = consumoTotal * horasUso * diasMes;
-                const tanquesNecessarios = Math.ceil(consumoTotal / 3);
-
-                const filteredAparelhos = aparelhos.filter(aparelho =>
-                    aparelho.nome.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-
-                return h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                    Header({ title: 'Calculadora de Dimensionamento', showBack: true }),
-                    h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
-                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Resultado do Dimensionamento'),
-                            h('div', { className: 'grid grid-cols-2 gap-4' },
-                                h('div', { className: 'text-center p-3 bg-blue-50 rounded' },
-                                    h('p', { className: 'text-2xl font-bold text-blue-600' }, consumoTotal.toFixed(1)),
-                                    h('p', { className: 'text-sm text-gray-600' }, 'kg/h Total')
-                                ),
-                                h('div', { className: 'text-center p-3 bg-green-50 rounded' },
-                                    h('p', { className: 'text-2xl font-bold text-green-600' }, tanquesNecessarios),
-                                    h('p', { className: 'text-sm text-gray-600' }, 'B190 Necessários')
-                                )
-                            ),
-                            h('div', { className: 'mt-3 p-3 bg-orange-50 rounded' },
-                                h('p', { className: 'text-sm text-orange-700' },
-                                    `Consumo mensal: ${consumoMensal.toFixed(0)} kg (${horasUso}h/dia × ${diasMes} dias)`
-                                )
-                            )
-                        ),
-                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Configurações de Uso'),
-                            h('div', { className: 'grid grid-cols-2 gap-4' },
-                                h('div', {},
-                                    h('label', { className: 'text-sm font-medium text-gray-600' }, 'Horas/dia'),
-                                    h('input', {
-                                        type: 'number',
-                                        value: horasUso,
-                                        onChange: (e) => setHorasUso(Number(e.target.value)),
-                                        className: 'w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
-                                    })
-                                ),
-                                h('div', {},
-                                    h('label', { className: 'text-sm font-medium text-gray-600' }, 'Dias/mês'),
-                                    h('input', {
-                                        type: 'number',
-                                        value: diasMes,
-                                        onChange: (e) => setDiasMes(Number(e.target.value)),
-                                        className: 'w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
-                                    })
-                                )
-                            )
-                        ),
-                        equipamentos.length > 0 && h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Equipamentos Selecionados'),
-                            h('div', { className: 'space-y-2' },
-                                equipamentos.map((eq) =>
-                                    h('div', { key: eq.id, className: 'flex items-center justify-between p-2 bg-gray-50 rounded' },
-                                        h('div', {},
-                                            h('p', { className: 'font-medium text-sm' }, eq.nome),
-                                            h('p', { className: 'text-xs text-gray-600' }, `${eq.consumo} kg/h`)
-                                        ),
-                                        h('button', {
-                                            onClick: () => setEquipamentos(equipamentos.filter(item => item.id !== eq.id)),
-                                            className: 'text-blue-500 hover:text-blue-700 p-1'
-                                        }, '✕')
-                                    )
-                                )
-                            )
-                        ),
-                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Adicionar Equipamentos'),
-                            h('div', { className: 'relative mb-3' },
-                                h('span', { className: 'absolute left-3 top-3 text-gray-400' }, '🔍'),
-                                h('input', {
-                                    type: 'text',
-                                    placeholder: 'Buscar aparelho...',
-                                    value: searchTerm,
-                                    onChange: (e) => setSearchTerm(e.target.value),
-                                    className: 'w-full pl-9 pr-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
-                                })
-                            ),
-                            h('div', { className: 'space-y-2 max-h-60 overflow-y-auto' },
-                                filteredAparelhos.map((aparelho, index) =>
-                                    h('button', {
-                                        key: index,
-                                        onClick: () => setEquipamentos([...equipamentos, { ...aparelho, id: Date.now() }]),
-                                        className: 'w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200'
-                                    },
-                                        h('div', { className: 'flex justify-between items-center' },
-                                            h('div', {},
-                                                h('p', { className: 'font-medium text-sm' }, aparelho.nome),
-                                                h('p', { className: 'text-xs text-gray-600' }, `${aparelho.potencia} kW`)
-                                            ),
-                                            h('span', { className: 'text-blue-600 font-semibold' }, `${aparelho.consumo} kg/h`)
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                );
-            };
-
-            const DistancesScreen = () => {
-                const [selectedState, setSelectedState] = useState('NBR 13523');
-
-                return h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                    Header({ title: 'Distanciamentos - Central em Nicho', showBack: true }),
-                    h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
-                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Selecionar Estado/Norma'),
-                            h('select', {
-                                value: selectedState,
-                                onChange: (e) => setSelectedState(e.target.value),
-                                className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500'
-                            },
-                                Object.keys(distanciamentosNicho).map(state =>
-                                    h('option', { key: state, value: state }, state)
-                                )
-                            )
-                        ),
-                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('div', { className: 'flex items-center justify-between mb-4' },
-                                h('h3', { className: 'font-semibold text-gray-800' }, 'Distâncias Mínimas (metros)'),
-                                h('span', { className: 'bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm font-medium' },
-                                    selectedState
-                                )
-                            ),
-                            h('div', { className: 'space-y-3' },
-                                [
-                                    { key: 'portas', label: 'Portas e janelas', icon: '🚪' },
-                                    { key: 'materiais', label: 'Materiais combustíveis', icon: '📦' },
-                                    { key: 'ignição', label: 'Pontos de ignição', icon: '⚡' },
-                                    { key: 'passeio', label: 'Passeio público', icon: '🚶' },
-                                    { key: 'chama', label: 'Chama aberta', icon: '🔥' },
-                                    { key: 'captação', label: 'Captação de ar forçado', icon: '🌪️' },
-                                    { key: 'produtos', label: 'Produtos tóxicos/inflamáveis', icon: '☠️' },
-                                    { key: 'gerador', label: 'Gerador a diesel', icon: '⚙️' },
-                                    { key: 'outras', label: 'Outras centrais GLP', icon: '🏭' }
-                                ].map(item =>
-                                    h('div', { key: item.key, className: 'flex items-center justify-between p-3 bg-gray-50 rounded' },
-                                        h('div', { className: 'flex items-center' },
-                                            h('span', { className: 'mr-3 text-lg' }, item.icon),
-                                            h('span', { className: 'text-sm font-medium text-gray-700' }, item.label)
-                                        ),
-                                        h('span', { className: 'font-bold text-blue-600' },
-                                            `${distanciamentosNicho[selectedState][item.key]}m`
-                                        )
-                                    )
-                                )
-                            )
-                        ),
-                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Informações Específicas'),
-                            h('div', { className: 'p-3 bg-green-50 rounded' },
-                                h('p', { className: 'text-sm font-medium text-green-800' }, 'Máximo de tanques permitidos'),
-                                h('p', { className: 'text-lg font-bold text-green-600' },
-                                    `${distanciamentosNicho[selectedState].maxTanques} B190/B125`
-                                )
-                            ),
-                            selectedState === 'MG' && h('div', { className: 'mt-2 p-3 bg-red-50 rounded border-l-4 border-red-500' },
-                                h('p', { className: 'text-sm font-medium text-red-800' }, '⚠️ Atenção'),
-                                h('p', { className: 'text-sm text-red-700' }, 'Nicho não permitido em MG')
-                            ),
-                            ['PR', 'ES', 'MS', 'GO', 'PA'].includes(selectedState) && h('div', { className: 'mt-2 p-3 bg-yellow-50 rounded border-l-4 border-yellow-500' },
-                                h('p', { className: 'text-sm font-medium text-yellow-800' }, '📍 Restrição'),
-                                h('p', { className: 'text-sm text-yellow-700' },
-                                    'Não permitido no corredor lateral, somente na fachada'
-                                )
-                            )
-                        )
-                    )
-                );
-            };
-
-            const NormsScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                Header({ title: 'Normas e Legislações', showBack: true }),
-                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
-                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                        h('h3', { className: 'font-semibold text-blue-600 mb-3' }, '📋 ABNT - Normas Técnicas'),
-                        h('div', { className: 'space-y-3' },
-                            [
-                                { codigo: 'NBR 13523', desc: 'Central de gás liquefeito de petróleo - GLP' },
-                                { codigo: 'NBR 14024', desc: 'Central de GLP - Sistema de abastecimento a granel' },
-                                { codigo: 'NBR 15358', desc: 'Rede de distribuição interna para uso não residencial' },
-                                { codigo: 'NBR 15526', desc: 'Redes de distribuição interna para instalações residenciais' }
-                            ].map((norma, index) =>
-                                h('div', { key: index, className: 'p-3 border border-gray-200 rounded-lg' },
-                                    h('p', { className: 'font-semibold text-gray-800' }, norma.codigo),
-                                    h('p', { className: 'text-sm text-gray-600' }, norma.desc)
-                                )
-                            )
-                        )
-                    ),
-                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                        h('h3', { className: 'font-semibold text-orange-600 mb-3' }, '🏛️ Legislações Federais'),
-                        h('div', { className: 'space-y-3' },
-                            [
-                                { codigo: 'ANP 18/2004', desc: 'Especificação do GLP' },
-                                { codigo: 'ANP 47/1999', desc: 'Sistema de Abastecimento de GLP à granel' },
-                                { codigo: 'ANP 49/2016', desc: 'Distribuidoras de GLP' },
-                                { codigo: 'NRs', desc: 'Normas Regulamentadoras - Ministério do Trabalho' }
-                            ].map((lei, index) =>
-                                h('div', { key: index, className: 'p-3 border border-gray-200 rounded-lg' },
-                                    h('p', { className: 'font-semibold text-gray-800' }, lei.codigo),
-                                    h('p', { className: 'text-sm text-gray-600' }, lei.desc)
-                                )
-                            )
-                        )
-                    ),
-                    h('div', { className: 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded' },
-                        h('h4', { className: 'font-semibold text-blue-800 mb-2' }, '⚠️ Hierarquia de Normas'),
-                        h('p', { className: 'text-blue-700 text-sm' },
-                            'Prioridade: 1º Instruções do Corpo de Bombeiros, 2º Procedimentos Ultragaz, 3º NBRs'
-                        )
-                    )
-                )
-            );
-
-            const SafetyScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                Header({ title: 'Segurança - Procedimentos', showBack: true }),
-                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
-                    h('div', { className: 'bg-blue-600 text-white rounded-lg p-4' },
-                        h('h3', { className: 'font-bold text-lg mb-2' }, '🛡️ SEGURANÇA COMO VALOR PRIMORDIAL'),
-                        h('p', { className: 'text-sm' },
-                            'A instalação em conformidade com as normas vigentes minimiza riscos e garante a segurança das instalações.'
-                        )
-                    ),
-                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                        h('h3', { className: 'font-semibold text-blue-600 mb-3' }, '⚠️ Riscos de Não Conformidade'),
-                        h('div', { className: 'space-y-3' },
-                            [
-                                { icon: '💥', text: 'Risco de acidentes' },
-                                { icon: '🚫', text: 'Risco de não pagamento do seguro em caso de acidente' },
-                                { icon: '🚨', text: 'Risco de interdição pelo Corpo de Bombeiros' },
-                                { icon: '⛔', text: 'Risco de não abastecimento pela Logística' }
-                            ].map((risco, index) =>
-                                h('div', { key: index, className: 'flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500' },
-                                    h('span', { className: 'text-xl mr-3' }, risco.icon),
-                                    h('span', { className: 'text-blue-700 font-medium' }, risco.text)
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-
-            const InvestmentScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                Header({ title: 'Análise de Investimento', showBack: true }),
-                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
-                    h('div', { className: 'bg-blue-600 text-white rounded-lg p-4' },
-                        h('h3', { className: 'font-bold text-lg mb-2' }, '💰 Composição do Investimento'),
-                        h('p', { className: 'text-sm' },
-                            'Para geração dos valores da OS, os kits devem ser lançados corretamente no Salesforce.'
-                        )
-                    ),
-                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
-                        h('h3', { className: 'font-semibold text-gray-800 mb-3' }, '📦 Kits Principais'),
-                        h('div', { className: 'space-y-3' },
-                            [
-                                'Kit Central: Projeto + Material + Mão de obra + Frete + Residual',
-                                'Kit Rede Completo: Material e mão de obra por metro',
-                                'Kit Abrigo Completo: Abrigo pré-moldado + montagem',
-                                'Kit Interligação: Material para ponto de consumo',
-                                'Kit km Entrega: Transporte por km (Munck)'
-                            ].map((kit, index) =>
-                                h('div', { key: index, className: 'p-3 border border-gray-200 rounded-lg' },
-                                    h('p', { className: 'font-medium text-blue-600' }, kit)
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-
-            const FAQScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
-                Header({ title: 'Dúvidas Frequentes', showBack: true }),
-                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
-                    [
-                        {
-                            pergunta: "Pode ser finalizada uma instalação com OS parcialmente aprovada?",
-                            resposta: "Não. Neste status não é possível realizar pagamento dos prestadores nem existe Base Instalada para NF de comodato."
-                        },
-                        {
-                            pergunta: "Quais condições obrigatórias para montagem?",
-                            resposta: "OS deve estar 'Aprovada' no Oracle PM, Projeto/croqui validado tecnicamente e OS com saldo suficiente."
-                        },
-                        {
-                            pergunta: "Posso solicitar visita de projeto sem OS?",
-                            resposta: "Sim, é possível. Porém, caso o negócio não seja fechado, o custo será lançado em despesa comercial."
-                        }
-                    ].map((faq, index) =>
-                        h('div', { key: index, className: 'bg-white rounded-lg shadow-md p-4' },
-                            h('details', { className: 'group' },
-                                h('summary', { className: 'flex justify-between items-center cursor-pointer' },
-                                    h('h3', { className: 'font-semibold text-gray-800 pr-4' }, faq.pergunta),
-                                    h('span', { className: 'text-blue-600 group-open:rotate-180 transition-transform' }, '▼')
-                                ),
-                                h('div', { className: 'mt-3 pt-3 border-t border-gray-100' },
-                                    h('p', { className: 'text-gray-700 text-sm leading-relaxed' }, faq.resposta)
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-
-            const BottomNav = () => h('div', { className: 'bg-white border-t border-gray-200 px-4 py-2' },
-                h('div', { className: 'flex justify-around' },
-                    h('button', {
-                        onClick: () => setCurrentScreen('home'),
-                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'home' ? 'text-blue-600' : 'text-gray-400'}`
-                    },
-                        h('div', { className: 'text-xl' }, '🏠'),
-                        h('span', { className: 'text-xs mt-1' }, 'Início')
-                    ),
-                    h('button', {
-                        onClick: () => setCurrentScreen('calculator'),
-                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'calculator' ? 'text-blue-600' : 'text-gray-400'}`
-                    },
-                        h('div', { className: 'text-xl' }, '🧮'),
-                        h('span', { className: 'text-xs mt-1' }, 'Calc')
-                    ),
-                    h('button', {
-                        onClick: () => setCurrentScreen('distances'),
-                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'distances' ? 'text-blue-600' : 'text-gray-400'}`
-                    },
-                        h('div', { className: 'text-xl' }, '📏'),
-                        h('span', { className: 'text-xs mt-1' }, 'Dist.')
-                    ),
-                    h('button', {
-                        onClick: () => setCurrentScreen('norms'),
-                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'norms' ? 'text-blue-600' : 'text-gray-400'}`
-                    },
-                        h('div', { className: 'text-xl' }, '📋'),
-                        h('span', { className: 'text-xs mt-1' }, 'Normas')
-                    )
-                )
-            );
-
-            const renderScreen = () => {
-                switch (currentScreen) {
-                    case 'home': return HomeScreen();
-                    case 'vasilhames': return VasilhamesScreen();
-                    case 'calculator': return CalculatorScreen();
-                    case 'distances': return DistancesScreen();
-                    case 'norms': return NormsScreen();
-                    case 'safety': return SafetyScreen();
-                    case 'investment': return InvestmentScreen();
-                    case 'faq': return FAQScreen();
-                    default: return HomeScreen();
-                }
-            };
-
-            return h('div', { className: 'max-w-md mx-auto bg-white min-h-screen flex flex-col' },
-                renderScreen(),
-                BottomNav()
-            );
+        // Screen Navigation
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(screenId).classList.add('active');
+            
+            // Update bottom navigation
+            updateBottomNavigation(screenId);
+            
+            // Initialize screen-specific data
+            if (screenId === 'distances-screen') {
+                updateDistances();
+            }
         }
 
-        // Hide Splash and Show App
+        function updateBottomNavigation(activeScreen) {
+            document.querySelectorAll('.bg-white.border-t button').forEach(btn => {
+                btn.className = btn.className.replace('text-blue-600', 'text-gray-400');
+            });
+            
+            // Set active button based on screen
+            const screenToNavMap = {
+                'home-screen': 0,
+                'calculator-screen': 1,
+                'distances-screen': 2,
+                'norms-screen': 3
+            };
+            
+            const navIndex = screenToNavMap[activeScreen];
+            if (navIndex !== undefined) {
+                const navButtons = document.querySelectorAll('.bg-white.border-t button');
+                if (navButtons[navIndex]) {
+                    navButtons[navIndex].className = navButtons[navIndex].className.replace('text-gray-400', 'text-blue-600');
+                }
+            }
+        }
+
+        // Calculator Functions
+        function addEquipment(nome, consumo) {
+            equipamentos.push({ nome, consumo, id: Date.now() });
+            consumoTotal += consumo;
+            updateCalculation();
+            showSelectedEquipments();
+        }
+
+        function removeEquipment(id) {
+            const index = equipamentos.findIndex(eq => eq.id === id);
+            if (index > -1) {
+                consumoTotal -= equipamentos[index].consumo;
+                equipamentos.splice(index, 1);
+                updateCalculation();
+                showSelectedEquipments();
+            }
+        }
+
+        function updateCalculation() {
+            const horas = parseFloat(document.getElementById('input-horas').value) || 8;
+            const dias = parseFloat(document.getElementById('input-dias').value) || 30;
+            const consumoMensal = consumoTotal * horas * dias;
+            const tanquesNecessarios = Math.ceil(consumoTotal / 3);
+
+            document.getElementById('consumo-total').textContent = consumoTotal.toFixed(1);
+            document.getElementById('tanques-necessarios').textContent = tanquesNecessarios;
+            document.getElementById('consumo-mensal').textContent = consumoMensal.toFixed(0);
+            document.getElementById('horas-uso').textContent = horas;
+            document.getElementById('dias-mes').textContent = dias;
+        }
+
+        function showSelectedEquipments() {
+            const container = document.getElementById('equipamentos-selecionados');
+            const lista = document.getElementById('lista-equipamentos');
+            
+            if (equipamentos.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            lista.innerHTML = equipamentos.map(eq => `
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div>
+                        <p class="font-medium text-sm">${eq.nome}</p>
+                        <p class="text-xs text-gray-600">${eq.consumo} kg/h</p>
+                    </div>
+                    <button onclick="removeEquipment(${eq.id})" 
+                            class="text-blue-500 hover:text-blue-700 p-1">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function clearCalculator() {
+            equipamentos = [];
+            consumoTotal = 0;
+            updateCalculation();
+            showSelectedEquipments();
+        }
+
+        // Distances Functions
+        function updateDistances() {
+            const selectedState = document.getElementById('state-selector').value;
+            const data = distanciamentosData[selectedState];
+            
+            document.getElementById('current-state').textContent = selectedState;
+            document.getElementById('max-tanks').textContent = `${data.maxTanques} B190/B125`;
+            
+            const distancesList = document.getElementById('distances-list');
+            distancesList.innerHTML = distanceLabels.map(item => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div class="flex items-center">
+                        <span class="mr-3 text-lg">${item.icon}</span>
+                        <span class="text-sm font-medium text-gray-700">${item.label}</span>
+                    </div>
+                    <span class="font-bold text-blue-600">${data[item.key]}m</span>
+                </div>
+            `).join('');
+            
+            // Update state-specific warnings
+            const warningsContainer = document.getElementById('state-warnings');
+            warningsContainer.innerHTML = '';
+            
+            if (selectedState === 'MG') {
+                warningsContainer.innerHTML = `
+                    <div class="mt-2 p-3 bg-red-50 rounded border-l-4 border-red-500">
+                        <p class="text-sm font-medium text-red-800">⚠️ Atenção</p>
+                        <p class="text-sm text-red-700">Nicho não permitido em MG</p>
+                    </div>
+                `;
+            } else if (['PR', 'ES', 'MS', 'GO', 'PA'].includes(selectedState)) {
+                warningsContainer.innerHTML = `
+                    <div class="mt-2 p-3 bg-yellow-50 rounded border-l-4 border-yellow-500">
+                        <p class="text-sm font-medium text-yellow-800">📍 Restrição</p>
+                        <p class="text-sm text-yellow-700">Não permitido no corredor lateral, somente na fachada</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize App
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('splash-screen').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
-                
-                // Render React App
-                ReactDOM.render(React.createElement(App), document.getElementById('app'));
+                updateDistances(); // Initialize distances data
             }, 2000);
         });
+
+        // Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'ultragaz-v2';
+                const urlsToCache = ['/'];
+                
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+                
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl)
+                .then(() => console.log('SW registrado'))
+                .catch(err => console.log('SW erro:', err));
+        }
 
         // Prevent zoom on double-tap
         let lastTouchEnd = 0;
@@ -790,6 +879,42 @@
             }
             lastTouchEnd = now;
         }, false);
+    </script>
+
+    <!-- PWA Manifest inline -->
+    <script>
+        const manifest = {
+            name: "Ultragaz - Guia Técnico",
+            short_name: "Ultragaz",
+            description: "Guia de bolso para instalações comerciais de GLP",
+            start_url: "/",
+            display: "standalone",
+            background_color: "#2563eb",
+            theme_color: "#2563eb",
+            orientation: "portrait",
+            scope: "/",
+            icons: [
+                {
+                    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='20' fill='%232563eb'/%3E%3Ctext x='96' y='120' text-anchor='middle' font-size='80' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E",
+                    sizes: "192x192",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                },
+                {
+                    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='50' fill='%232563eb'/%3E%3Ctext x='256' y='320' text-anchor='middle' font-size='200' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E",
+                    sizes: "512x512",
+                    type: "image/svg+xml",
+                    purpose: "any maskable"
+                }
+            ]
+        };
+        
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(blob);
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestURL;
+        document.head.appendChild(link);
     </script>
 </body>
 </html>
