@@ -1,27 +1,11 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultragaz - Guia Técnico</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="description" content="Guia de bolso para instalações comerciais de GLP da Ultragaz">
-    <meta name="theme-color" content="#2563eb">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Ultragaz">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <!-- Ícone -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232563eb'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='14' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%232563eb'/%3E%3Ctext x='96' y='120' text-anchor='middle' font-size='80' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%232563eb'/%3E%3Ctext x='90' y='110' text-anchor='middle' font-size='70' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         /* Remove qualquer indicação de browser */
         * {
+            -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -37,9 +21,21 @@
             user-select: text;
         }
 
-        body {
+        html, body {
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
+            position: relative;
+            height: 100%;
+        }
+
+        /* Força comportamento nativo */
+        #app {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
         }
 
         .splash-screen {
@@ -68,15 +64,28 @@
 
         .screen {
             display: none;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .screen.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Prevent zoom on iOS */
+        /* Prevent zoom */
         input[type="text"], input[type="number"], select, textarea {
-            font-size: 16px;
+            font-size: 16px !important;
+        }
+
+        /* Botões funcionais */
+        .btn-nav {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -97,10 +106,10 @@
 
     <!-- App Container -->
     <div id="app" style="display: none;">
-        <div class="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+        <div class="max-w-md mx-auto bg-white h-full flex flex-col">
             
             <!-- Home Screen -->
-            <div id="home-screen" class="screen active flex-1">
+            <div id="home-screen" class="screen active">
                 <!-- Header -->
                 <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
                     <h1 class="text-lg font-bold flex-1">Ultragaz - Guia Técnico</h1>
@@ -119,31 +128,31 @@
                 </div>
 
                 <!-- Main Content -->
-                <div class="flex-1 p-4 space-y-4">
+                <div class="flex-1 p-4 space-y-4 overflow-y-auto">
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Vasilhames -->
-                        <button onclick="showScreen('vasilhames-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+                        <button onclick="navegarPara('vasilhames-screen')" class="btn-nav bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg">
                             <div class="text-blue-600 mb-2 text-2xl">🏗️</div>
                             <h3 class="font-semibold text-gray-800">Vasilhames</h3>
                             <p class="text-sm text-gray-600 mt-1">B190 e B125</p>
                         </button>
 
                         <!-- Calculadora -->
-                        <button onclick="showScreen('calculator-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow">
+                        <button onclick="navegarPara('calculator-screen')" class="btn-nav bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg">
                             <div class="text-green-600 mb-2 text-2xl">🧮</div>
                             <h3 class="font-semibold text-gray-800">Calculadora</h3>
                             <p class="text-sm text-gray-600 mt-1">Dimensionamento</p>
                         </button>
 
                         <!-- Distâncias -->
-                        <button onclick="showScreen('distances-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 hover:shadow-lg transition-shadow">
+                        <button onclick="navegarPara('distances-screen')" class="btn-nav bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 hover:shadow-lg">
                             <div class="text-orange-600 mb-2 text-2xl">📏</div>
                             <h3 class="font-semibold text-gray-800">Distâncias</h3>
                             <p class="text-sm text-gray-600 mt-1">Por estado</p>
                         </button>
 
                         <!-- Normas -->
-                        <button onclick="showScreen('norms-screen')" class="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
+                        <button onclick="navegarPara('norms-screen')" class="btn-nav bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg">
                             <div class="text-purple-600 mb-2 text-2xl">📋</div>
                             <h3 class="font-semibold text-gray-800">Normas</h3>
                             <p class="text-sm text-gray-600 mt-1">NBR e ITs</p>
@@ -154,15 +163,15 @@
                     <div class="bg-white rounded-lg shadow-md p-4">
                         <h3 class="font-semibold text-gray-800 mb-3">Acesso Rápido</h3>
                         <div class="space-y-2">
-                            <button onclick="showScreen('safety-screen')" class="w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100">
+                            <button onclick="navegarPara('safety-screen')" class="btn-nav w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100">
                                 <span class="text-blue-600 font-medium">⚠️ Segurança</span>
                                 <p class="text-sm text-gray-600">Procedimentos obrigatórios</p>
                             </button>
-                            <button onclick="showScreen('investment-screen')" class="w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100">
+                            <button onclick="navegarPara('investment-screen')" class="btn-nav w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100">
                                 <span class="text-green-600 font-medium">💰 Investimento</span>
                                 <p class="text-sm text-gray-600">Análise de custos</p>
                             </button>
-                            <button onclick="showScreen('faq-screen')" class="w-full text-left p-3 hover:bg-gray-50 rounded">
+                            <button onclick="navegarPara('faq-screen')" class="btn-nav w-full text-left p-3 hover:bg-gray-50 rounded">
                                 <span class="text-orange-600 font-medium">❓ FAQ</span>
                                 <p class="text-sm text-gray-600">Dúvidas frequentes</p>
                             </button>
@@ -171,114 +180,17 @@
                 </div>
             </div>
 
-            <!-- Vasilhames Screen -->
-            <div id="vasilhames-screen" class="screen flex-1">
-                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
-                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
-                    <h1 class="text-lg font-bold flex-1">Características dos Vasilhames</h1>
-                </div>
-                
-                <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                    <!-- B190 -->
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                <span class="text-blue-600 font-bold text-lg">B190</span>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-800">Vasilhame B190</h3>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-3">
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Diâmetro</span>
-                                    <p class="text-lg font-semibold text-gray-800">76,18 cm</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Altura</span>
-                                    <p class="text-lg font-semibold text-gray-800">131,9 cm</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Vazão</span>
-                                    <p class="text-lg font-semibold text-blue-600">03 kg/h</p>
-                                </div>
-                            </div>
-                            <div class="space-y-3">
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Tara Média</span>
-                                    <p class="text-lg font-semibold text-gray-800">145 kg</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Capacidade GLP</span>
-                                    <p class="text-lg font-semibold text-green-600">190 kg</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Cap. Volumétrica</span>
-                                    <p class="text-lg font-semibold text-gray-800">452 L</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- B125 -->
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                <span class="text-blue-600 font-bold text-lg">B125</span>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-800">Vasilhame B125</h3>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-3">
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Diâmetro</span>
-                                    <p class="text-lg font-semibold text-gray-800">61,0 cm</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Altura</span>
-                                    <p class="text-lg font-semibold text-gray-800">133,7 cm</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Vazão</span>
-                                    <p class="text-lg font-semibold text-blue-600">02,5 kg/h</p>
-                                </div>
-                            </div>
-                            <div class="space-y-3">
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Tara Média</span>
-                                    <p class="text-lg font-semibold text-gray-800">100 kg</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Capacidade GLP</span>
-                                    <p class="text-lg font-semibold text-green-600">125 kg</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm font-medium text-gray-600">Cap. Volumétrica</span>
-                                    <p class="text-lg font-semibold text-gray-800">300 L</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                        <h4 class="font-semibold text-blue-800 mb-2">💡 Dica Importante</h4>
-                        <p class="text-blue-700 text-sm">
-                            O B190 tem vazão de 3kg/h, ideal para estabelecimentos com maior consumo.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Calculator Screen -->
-            <div id="calculator-screen" class="screen flex-1">
+            <div id="calculator-screen" class="screen">
                 <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
-                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
-                    <h1 class="text-lg font-bold flex-1">Calculadora de Dimensionamento</h1>
+                    <button onclick="navegarPara('home-screen')" class="btn-nav mr-3 p-2 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Calculadora</h1>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
                     <!-- Resultado -->
                     <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Resultado do Dimensionamento</h3>
+                        <h3 class="font-semibold text-gray-800 mb-3">Resultado</h3>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="text-center p-3 bg-blue-50 rounded">
                                 <p class="text-2xl font-bold text-blue-600" id="consumo-total">0.0</p>
@@ -289,122 +201,61 @@
                                 <p class="text-sm text-gray-600">B190 Necessários</p>
                             </div>
                         </div>
-                        <div class="mt-3 p-3 bg-orange-50 rounded">
-                            <p class="text-sm text-orange-700">
-                                <strong>Consumo mensal:</strong> <span id="consumo-mensal">0</span> kg (<span id="horas-uso">8</span>h/dia × <span id="dias-mes">30</span> dias)
-                            </p>
-                        </div>
                     </div>
 
-                    <!-- Configurações -->
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Configurações de Uso</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-sm font-medium text-gray-600">Horas/dia</label>
-                                <input type="number" id="input-horas" value="8" onchange="updateCalculation()" 
-                                       class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="text-sm font-medium text-gray-600">Dias/mês</label>
-                                <input type="number" id="input-dias" value="30" onchange="updateCalculation()" 
-                                       class="w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Equipamentos Selecionados -->
-                    <div id="equipamentos-selecionados" class="bg-white rounded-lg shadow-md p-4" style="display: none;">
-                        <h3 class="font-semibold text-gray-800 mb-3">Equipamentos Selecionados</h3>
-                        <div id="lista-equipamentos" class="space-y-2"></div>
-                    </div>
-
-                    <!-- Adicionar Equipamentos -->
+                    <!-- Equipamentos -->
                     <div class="bg-white rounded-lg shadow-md p-4">
                         <h3 class="font-semibold text-gray-800 mb-3">Adicionar Equipamentos</h3>
                         <div class="space-y-2">
-                            <button onclick="addEquipment('Fogão duas bocas (Portátil)', 0.34)" 
-                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                            <button onclick="adicionarEquip('Fogão 4 bocas', 0.95)" 
+                                    class="btn-nav w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
                                 <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium text-sm">Fogão duas bocas (Portátil)</p>
-                                        <p class="text-xs text-gray-600">2.9 kW</p>
-                                    </div>
-                                    <span class="text-blue-600 font-semibold">0.34 kg/h</span>
-                                </div>
-                            </button>
-                            <button onclick="addEquipment('Fogão quatro bocas (Sem forno)', 0.95)" 
-                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium text-sm">Fogão quatro bocas (Sem forno)</p>
-                                        <p class="text-xs text-gray-600">8.1 kW</p>
-                                    </div>
+                                    <span class="font-medium text-sm">Fogão 4 bocas</span>
                                     <span class="text-blue-600 font-semibold">0.95 kg/h</span>
                                 </div>
                             </button>
-                            <button onclick="addEquipment('Fogão quatro bocas (Com forno)', 1.27)" 
-                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                            <button onclick="adicionarEquip('Fritadeira', 1.5)" 
+                                    class="btn-nav w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
                                 <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium text-sm">Fogão quatro bocas (Com forno)</p>
-                                        <p class="text-xs text-gray-600">10.8 kW</p>
-                                    </div>
-                                    <span class="text-blue-600 font-semibold">1.27 kg/h</span>
-                                </div>
-                            </button>
-                            <button onclick="addEquipment('Fritadeira comercial', 1.5)" 
-                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium text-sm">Fritadeira comercial</p>
-                                        <p class="text-xs text-gray-600">12.8 kW</p>
-                                    </div>
+                                    <span class="font-medium text-sm">Fritadeira comercial</span>
                                     <span class="text-blue-600 font-semibold">1.5 kg/h</span>
                                 </div>
                             </button>
-                            <button onclick="addEquipment('Forno de parede', 0.41)" 
-                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
+                            <button onclick="adicionarEquip('Forno', 0.41)" 
+                                    class="btn-nav w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
                                 <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium text-sm">Forno de parede</p>
-                                        <p class="text-xs text-gray-600">3.5 kW</p>
-                                    </div>
+                                    <span class="font-medium text-sm">Forno de parede</span>
                                     <span class="text-blue-600 font-semibold">0.41 kg/h</span>
-                                </div>
-                            </button>
-                            <button onclick="addEquipment('Aquecedor 6 L/min', 1.23)" 
-                                    class="w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium text-sm">Aquecedor 6 L/min</p>
-                                        <p class="text-xs text-gray-600">10.5 kW</p>
-                                    </div>
-                                    <span class="text-blue-600 font-semibold">1.23 kg/h</span>
                                 </div>
                             </button>
                         </div>
                         
-                        <button onclick="clearCalculator()" 
-                                class="mt-4 w-full bg-gray-500 text-white py-2 rounded hover:bg-gray-600">
-                            Limpar Calculadora
+                        <button onclick="limparCalc()" 
+                                class="btn-nav mt-4 w-full bg-gray-500 text-white py-2 rounded hover:bg-gray-600">
+                            Limpar
                         </button>
+                    </div>
+
+                    <!-- Lista de Equipamentos -->
+                    <div id="lista-equipamentos" class="bg-white rounded-lg shadow-md p-4" style="display: none;">
+                        <h3 class="font-semibold text-gray-800 mb-3">Selecionados</h3>
+                        <div id="equip-lista" class="space-y-2"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Distances Screen -->
-            <div id="distances-screen" class="screen flex-1">
+            <div id="distances-screen" class="screen">
                 <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
-                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
-                    <h1 class="text-lg font-bold flex-1">Distanciamentos - Central em Nicho</h1>
+                    <button onclick="navegarPara('home-screen')" class="btn-nav mr-3 p-2 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Distâncias</h1>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                    <!-- Seletor de Estado -->
+                    <!-- Seletor -->
                     <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Selecionar Estado/Norma</h3>
-                        <select id="state-selector" onchange="updateDistances()" 
+                        <h3 class="font-semibold text-gray-800 mb-3">Estado/Norma</h3>
+                        <select id="state-selector" onchange="atualizarDistancias()" 
                                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                             <option value="NBR 13523">NBR 13523</option>
                             <option value="SP">São Paulo (SP)</option>
@@ -419,221 +270,130 @@
 
                     <!-- Distâncias -->
                     <div class="bg-white rounded-lg shadow-md p-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-semibold text-gray-800">Distâncias Mínimas (metros)</h3>
-                            <span id="current-state" class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm font-medium">
-                                NBR 13523
-                            </span>
-                        </div>
-                        
-                        <div class="space-y-3" id="distances-list">
-                            <!-- Será preenchido pelo JavaScript -->
+                        <h3 class="font-semibold text-gray-800 mb-3">Distâncias Mínimas (metros)</h3>
+                        <div id="dist-lista" class="space-y-3">
+                            <!-- Preenchido pelo JS -->
                         </div>
                     </div>
 
-                    <!-- Informações Específicas -->
+                    <!-- Info -->
                     <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Informações Específicas</h3>
                         <div class="p-3 bg-green-50 rounded">
-                            <p class="text-sm font-medium text-green-800">Máximo de tanques permitidos</p>
+                            <p class="text-sm font-medium text-green-800">Máximo de tanques</p>
                             <p class="text-lg font-bold text-green-600" id="max-tanks">2 B190/B125</p>
                         </div>
-                        
-                        <div id="state-warnings" class="mt-2">
-                            <!-- Avisos específicos por estado -->
+                        <div id="avisos-estado" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vasilhames Screen -->
+            <div id="vasilhames-screen" class="screen">
+                <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
+                    <button onclick="navegarPara('home-screen')" class="btn-nav mr-3 p-2 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Vasilhames</h1>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- B190 -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold">B190</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800">Vasilhame B190</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="font-medium text-gray-600">Diâmetro:</span><p class="text-gray-800">76,18 cm</p></div>
+                            <div><span class="font-medium text-gray-600">Altura:</span><p class="text-gray-800">131,9 cm</p></div>
+                            <div><span class="font-medium text-gray-600">Vazão:</span><p class="text-blue-600 font-semibold">03 kg/h</p></div>
+                            <div><span class="font-medium text-gray-600">Capacidade:</span><p class="text-green-600 font-semibold">190 kg</p></div>
+                        </div>
+                    </div>
+
+                    <!-- B125 -->
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-blue-600 font-bold">B125</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800">Vasilhame B125</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="font-medium text-gray-600">Diâmetro:</span><p class="text-gray-800">61,0 cm</p></div>
+                            <div><span class="font-medium text-gray-600">Altura:</span><p class="text-gray-800">133,7 cm</p></div>
+                            <div><span class="font-medium text-gray-600">Vazão:</span><p class="text-blue-600 font-semibold">02,5 kg/h</p></div>
+                            <div><span class="font-medium text-gray-600">Capacidade:</span><p class="text-green-600 font-semibold">125 kg</p></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Norms Screen -->
-            <div id="norms-screen" class="screen flex-1">
+            <div id="norms-screen" class="screen">
                 <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
-                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
-                    <h1 class="text-lg font-bold flex-1">Normas e Legislações</h1>
+                    <button onclick="navegarPara('home-screen')" class="btn-nav mr-3 p-2 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Normas</h1>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
                     <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-blue-600 mb-3">📋 ABNT - Normas Técnicas</h3>
+                        <h3 class="font-semibold text-blue-600 mb-3">📋 NBRs</h3>
                         <div class="space-y-3">
-                            <div class="p-3 border border-gray-200 rounded-lg">
+                            <div class="p-3 border border-gray-200 rounded">
                                 <p class="font-semibold text-gray-800">NBR 13523</p>
-                                <p class="text-sm text-gray-600">Central de gás liquefeito de petróleo - GLP</p>
+                                <p class="text-sm text-gray-600">Central de GLP</p>
                             </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <p class="font-semibold text-gray-800">NBR 14024</p>
-                                <p class="text-sm text-gray-600">Central de GLP - Sistema de abastecimento a granel</p>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
+                            <div class="p-3 border border-gray-200 rounded">
                                 <p class="font-semibold text-gray-800">NBR 15358</p>
-                                <p class="text-sm text-gray-600">Rede de distribuição interna para uso não residencial</p>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <p class="font-semibold text-gray-800">NBR 15526</p>
-                                <p class="text-sm text-gray-600">Redes de distribuição interna para instalações residenciais</p>
+                                <p class="text-sm text-gray-600">Rede interna não residencial</p>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-orange-600 mb-3">🏛️ Legislações Federais</h3>
-                        <div class="space-y-3">
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <p class="font-semibold text-gray-800">ANP 18/2004</p>
-                                <p class="text-sm text-gray-600">Especificação do GLP</p>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <p class="font-semibold text-gray-800">ANP 47/1999</p>
-                                <p class="text-sm text-gray-600">Sistema de Abastecimento de GLP à granel</p>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <p class="font-semibold text-gray-800">ANP 49/2016</p>
-                                <p class="text-sm text-gray-600">Distribuidoras de GLP</p>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <p class="font-semibold text-gray-800">NRs</p>
-                                <p class="text-sm text-gray-600">Normas Regulamentadoras - Ministério do Trabalho</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                        <h4 class="font-semibold text-blue-800 mb-2">⚠️ Hierarquia de Normas</h4>
-                        <p class="text-blue-700 text-sm">
-                            <strong>Prioridade:</strong> 1º Instruções do Corpo de Bombeiros, 2º Procedimentos Ultragaz, 3º NBRs
-                        </p>
                     </div>
                 </div>
             </div>
 
             <!-- Safety Screen -->
-            <div id="safety-screen" class="screen flex-1">
+            <div id="safety-screen" class="screen">
                 <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
-                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
-                    <h1 class="text-lg font-bold flex-1">Segurança - Procedimentos</h1>
+                    <button onclick="navegarPara('home-screen')" class="btn-nav mr-3 p-2 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Segurança</h1>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
                     <div class="bg-blue-600 text-white rounded-lg p-4">
-                        <h3 class="font-bold text-lg mb-2">🛡️ SEGURANÇA COMO VALOR PRIMORDIAL</h3>
-                        <p class="text-sm">
-                            A instalação em conformidade com as normas vigentes minimiza riscos e garante a segurança das instalações.
-                        </p>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-blue-600 mb-3">⚠️ Riscos de Não Conformidade</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
-                                <span class="text-xl mr-3">💥</span>
-                                <span class="text-blue-700 font-medium">Risco de acidentes</span>
-                            </div>
-                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
-                                <span class="text-xl mr-3">🚫</span>
-                                <span class="text-blue-700 font-medium">Risco de não pagamento do seguro</span>
-                            </div>
-                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
-                                <span class="text-xl mr-3">🚨</span>
-                                <span class="text-blue-700 font-medium">Risco de interdição pelo Corpo de Bombeiros</span>
-                            </div>
-                            <div class="flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500">
-                                <span class="text-xl mr-3">⛔</span>
-                                <span class="text-blue-700 font-medium">Risco de não abastecimento pela Logística</span>
-                            </div>
-                        </div>
+                        <h3 class="font-bold text-lg mb-2">🛡️ Segurança Primordial</h3>
+                        <p class="text-sm">Instalação conforme normas minimiza riscos.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Investment Screen -->
-            <div id="investment-screen" class="screen flex-1">
+            <div id="investment-screen" class="screen">
                 <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
-                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
-                    <h1 class="text-lg font-bold flex-1">Análise de Investimento</h1>
+                    <button onclick="navegarPara('home-screen')" class="btn-nav mr-3 p-2 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">Investimento</h1>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
                     <div class="bg-blue-600 text-white rounded-lg p-4">
-                        <h3 class="font-bold text-lg mb-2">💰 Composição do Investimento</h3>
-                        <p class="text-sm">
-                            Para geração dos valores da OS, os kits devem ser lançados corretamente no Salesforce.
-                        </p>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">📦 Kits Principais</h3>
-                        <div class="space-y-3">
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <h4 class="font-semibold text-blue-600 mb-2">Kit Central</h4>
-                                <ul class="text-sm text-gray-600 space-y-1">
-                                    <li>• Custo do Projeto da Central</li>
-                                    <li>• Material para montagem até saída do 1º estágio</li>
-                                    <li>• Mão de obra para montagem mecânica</li>
-                                    <li>• Frete para entrega do vasilhame</li>
-                                </ul>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <h4 class="font-semibold text-blue-600 mb-2">Kit Rede Completo</h4>
-                                <ul class="text-sm text-gray-600 space-y-1">
-                                    <li>• Material e mão de obra por metro de rede</li>
-                                    <li>• Lançar quantidade correta em metros</li>
-                                </ul>
-                            </div>
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <h4 class="font-semibold text-blue-600 mb-2">Kit Abrigo Completo</h4>
-                                <ul class="text-sm text-gray-600 space-y-1">
-                                    <li>• Abrigo pré-moldado</li>
-                                    <li>• Mão de obra para montagem</li>
-                                </ul>
-                            </div>
-                        </div>
+                        <h3 class="font-bold text-lg mb-2">💰 Kits de Investimento</h3>
+                        <p class="text-sm">Lançar kits corretamente no Salesforce.</p>
                     </div>
                 </div>
             </div>
 
             <!-- FAQ Screen -->
-            <div id="faq-screen" class="screen flex-1">
+            <div id="faq-screen" class="screen">
                 <div class="bg-blue-600 text-white p-4 flex items-center shadow-lg">
-                    <button onclick="showScreen('home-screen')" class="mr-3 p-1 hover:bg-blue-700 rounded text-xl">←</button>
-                    <h1 class="text-lg font-bold flex-1">Dúvidas Frequentes</h1>
+                    <button onclick="navegarPara('home-screen')" class="btn-nav mr-3 p-2 hover:bg-blue-700 rounded text-xl">←</button>
+                    <h1 class="text-lg font-bold flex-1">FAQ</h1>
                 </div>
                 
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
                     <div class="bg-white rounded-lg shadow-md p-4">
-                        <details class="group">
-                            <summary class="flex justify-between items-center cursor-pointer">
-                                <h3 class="font-semibold text-gray-800 pr-4">Pode ser finalizada instalação com OS parcialmente aprovada?</h3>
-                                <span class="text-blue-600 group-open:rotate-180 transition-transform">▼</span>
-                            </summary>
-                            <div class="mt-3 pt-3 border-t border-gray-100">
-                                <p class="text-gray-700 text-sm">Não. Neste status não é possível realizar pagamento dos prestadores nem existe Base Instalada para NF de comodato.</p>
-                            </div>
-                        </details>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <details class="group">
-                            <summary class="flex justify-between items-center cursor-pointer">
-                                <h3 class="font-semibold text-gray-800 pr-4">Quais condições obrigatórias para montagem?</h3>
-                                <span class="text-blue-600 group-open:rotate-180 transition-transform">▼</span>
-                            </summary>
-                            <div class="mt-3 pt-3 border-t border-gray-100">
-                                <p class="text-gray-700 text-sm">OS deve estar 'Aprovada' no Oracle PM, Projeto/croqui validado tecnicamente e OS com saldo suficiente.</p>
-                            </div>
-                        </details>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-4">
-                        <details class="group">
-                            <summary class="flex justify-between items-center cursor-pointer">
-                                <h3 class="font-semibold text-gray-800 pr-4">Posso solicitar visita de projeto sem OS?</h3>
-                                <span class="text-blue-600 group-open:rotate-180 transition-transform">▼</span>
-                            </summary>
-                            <div class="mt-3 pt-3 border-t border-gray-100">
-                                <p class="text-gray-700 text-sm">Sim, é possível. Porém, caso o negócio não seja fechado, o custo será lançado em despesa comercial.</p>
-                            </div>
-                        </details>
+                        <h3 class="font-semibold text-gray-800">OS parcialmente aprovada?</h3>
+                        <p class="text-sm text-gray-600 mt-2">Não pode ser finalizada. Não há Base Instalada.</p>
                     </div>
                 </div>
             </div>
@@ -641,21 +401,21 @@
             <!-- Bottom Navigation -->
             <div class="bg-white border-t border-gray-200 px-4 py-2">
                 <div class="flex justify-around">
-                    <button onclick="showScreen('home-screen')" class="flex flex-col items-center py-2 px-3 rounded text-blue-600">
+                    <button onclick="navegarPara('home-screen')" id="nav-home" class="btn-nav flex flex-col items-center py-2 px-3 rounded text-blue-600">
                         <div class="text-xl">🏠</div>
                         <span class="text-xs mt-1">Início</span>
                     </button>
-                    <button onclick="showScreen('calculator-screen')" class="flex flex-col items-center py-2 px-3 rounded text-gray-400">
+                    <button onclick="navegarPara('calculator-screen')" id="nav-calc" class="btn-nav flex flex-col items-center py-2 px-3 rounded text-gray-400">
                         <div class="text-xl">🧮</div>
                         <span class="text-xs mt-1">Calc</span>
                     </button>
-                    <button onclick="showScreen('distances-screen')" class="flex flex-col items-center py-2 px-3 rounded text-gray-400">
+                    <button onclick="navegarPara('distances-screen')" id="nav-dist" class="btn-nav flex flex-col items-center py-2 px-3 rounded text-gray-400">
                         <div class="text-xl">📏</div>
                         <span class="text-xs mt-1">Dist.</span>
                     </button>
-                    <button onclick="showScreen('norms-screen')" class="flex flex-col items-center py-2 px-3 rounded text-gray-400">
-                        <div class="text-xl">📋</div>
-                        <span class="text-xs mt-1">Normas</span>
+                    <button onclick="navegarPara('vasilhames-screen')" id="nav-vasil" class="btn-nav flex flex-col items-center py-2 px-3 rounded text-gray-400">
+                        <div class="text-xl">🏗️</div>
+                        <span class="text-xs mt-1">Info</span>
                     </button>
                 </div>
             </div>
@@ -663,36 +423,33 @@
     </div>
 
     <script>
-        // App State
+        // Estado da aplicação
         let equipamentos = [];
         let consumoTotal = 0;
 
-        // Dados de distanciamento por estado
-        const distanciamentosData = {
-            'NBR 13523': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
-            'SP': { portas: 1.5, materiais: 1.5, ignição: 1.5, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
-            'RJ': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
-            'PR': { portas: 3, materiais: 3, ignição: 3, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
-            'ES': { portas: 1.5, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
-            'MS': { portas: 3, materiais: 3, ignição: 3, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
-            'GO': { portas: 0, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
-            'PA': { portas: 0, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 }
+        // Dados de distanciamento
+        const distData = {
+            'NBR 13523': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, maxTanques: 2 },
+            'SP': { portas: 1.5, materiais: 1.5, ignição: 1.5, passeio: 0, chama: 6, captação: 6, maxTanques: 2 },
+            'RJ': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, maxTanques: 2 },
+            'PR': { portas: 3, materiais: 3, ignição: 3, passeio: 0.8, chama: 6, captação: 6, maxTanques: 1 },
+            'ES': { portas: 1.5, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, maxTanques: 1 },
+            'MS': { portas: 3, materiais: 3, ignição: 3, passeio: 0.8, chama: 6, captação: 6, maxTanques: 1 },
+            'GO': { portas: 0, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, maxTanques: 1 },
+            'PA': { portas: 0, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, maxTanques: 1 }
         };
 
-        const distanceLabels = [
+        const distLabels = [
             { key: 'portas', label: 'Portas e janelas', icon: '🚪' },
             { key: 'materiais', label: 'Materiais combustíveis', icon: '📦' },
             { key: 'ignição', label: 'Pontos de ignição', icon: '⚡' },
             { key: 'passeio', label: 'Passeio público', icon: '🚶' },
             { key: 'chama', label: 'Chama aberta', icon: '🔥' },
-            { key: 'captação', label: 'Captação de ar forçado', icon: '🌪️' },
-            { key: 'produtos', label: 'Produtos tóxicos/inflamáveis', icon: '☠️' },
-            { key: 'gerador', label: 'Gerador a diesel', icon: '⚙️' },
-            { key: 'outras', label: 'Outras centrais GLP', icon: '🏭' }
+            { key: 'captação', label: 'Captação de ar forçado', icon: '🌪️' }
         ];
 
-        // Screen Navigation
-        function showScreen(screenId) {
+        // Navegação
+        function navegarPara(screenId) {
             // Hide all screens
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
@@ -701,71 +458,58 @@
             // Show selected screen
             document.getElementById(screenId).classList.add('active');
             
-            // Update bottom navigation
-            updateBottomNavigation(screenId);
-            
-            // Initialize screen-specific data
-            if (screenId === 'distances-screen') {
-                updateDistances();
-            }
-        }
-
-        function updateBottomNavigation(activeScreen) {
-            document.querySelectorAll('.bg-white.border-t button').forEach(btn => {
+            // Update navigation
+            document.querySelectorAll('[id^="nav-"]').forEach(btn => {
                 btn.className = btn.className.replace('text-blue-600', 'text-gray-400');
             });
             
-            // Set active button based on screen
-            const screenToNavMap = {
-                'home-screen': 0,
-                'calculator-screen': 1,
-                'distances-screen': 2,
-                'norms-screen': 3
+            // Set active nav
+            const navMap = {
+                'home-screen': 'nav-home',
+                'calculator-screen': 'nav-calc',
+                'distances-screen': 'nav-dist',
+                'vasilhames-screen': 'nav-vasil'
             };
             
-            const navIndex = screenToNavMap[activeScreen];
-            if (navIndex !== undefined) {
-                const navButtons = document.querySelectorAll('.bg-white.border-t button');
-                if (navButtons[navIndex]) {
-                    navButtons[navIndex].className = navButtons[navIndex].className.replace('text-gray-400', 'text-blue-600');
+            if (navMap[screenId]) {
+                const navBtn = document.getElementById(navMap[screenId]);
+                if (navBtn) {
+                    navBtn.className = navBtn.className.replace('text-gray-400', 'text-blue-600');
                 }
+            }
+            
+            // Initialize screen data
+            if (screenId === 'distances-screen') {
+                atualizarDistancias();
             }
         }
 
-        // Calculator Functions
-        function addEquipment(nome, consumo) {
+        // Calculadora
+        function adicionarEquip(nome, consumo) {
             equipamentos.push({ nome, consumo, id: Date.now() });
             consumoTotal += consumo;
-            updateCalculation();
-            showSelectedEquipments();
+            atualizarCalculadora();
+            mostrarEquipamentos();
         }
 
-        function removeEquipment(id) {
+        function removerEquip(id) {
             const index = equipamentos.findIndex(eq => eq.id === id);
             if (index > -1) {
                 consumoTotal -= equipamentos[index].consumo;
                 equipamentos.splice(index, 1);
-                updateCalculation();
-                showSelectedEquipments();
+                atualizarCalculadora();
+                mostrarEquipamentos();
             }
         }
 
-        function updateCalculation() {
-            const horas = parseFloat(document.getElementById('input-horas').value) || 8;
-            const dias = parseFloat(document.getElementById('input-dias').value) || 30;
-            const consumoMensal = consumoTotal * horas * dias;
-            const tanquesNecessarios = Math.ceil(consumoTotal / 3);
-
+        function atualizarCalculadora() {
             document.getElementById('consumo-total').textContent = consumoTotal.toFixed(1);
-            document.getElementById('tanques-necessarios').textContent = tanquesNecessarios;
-            document.getElementById('consumo-mensal').textContent = consumoMensal.toFixed(0);
-            document.getElementById('horas-uso').textContent = horas;
-            document.getElementById('dias-mes').textContent = dias;
+            document.getElementById('tanques-necessarios').textContent = Math.ceil(consumoTotal / 3);
         }
 
-        function showSelectedEquipments() {
-            const container = document.getElementById('equipamentos-selecionados');
-            const lista = document.getElementById('lista-equipamentos');
+        function mostrarEquipamentos() {
+            const container = document.getElementById('lista-equipamentos');
+            const lista = document.getElementById('equip-lista');
             
             if (equipamentos.length === 0) {
                 container.style.display = 'none';
@@ -779,142 +523,31 @@
                         <p class="font-medium text-sm">${eq.nome}</p>
                         <p class="text-xs text-gray-600">${eq.consumo} kg/h</p>
                     </div>
-                    <button onclick="removeEquipment(${eq.id})" 
-                            class="text-blue-500 hover:text-blue-700 p-1">✕</button>
+                    <button onclick="removerEquip(${eq.id})" class="btn-nav text-blue-500 p-1">✕</button>
                 </div>
             `).join('');
         }
 
-        function clearCalculator() {
+        function limparCalc() {
             equipamentos = [];
-            consumoTotal = 0;
-            updateCalculation();
-            showSelectedEquipments();
-        }
-
-        // Distances Functions
-        function updateDistances() {
-            const selectedState = document.getElementById('state-selector').value;
-            const data = distanciamentosData[selectedState];
-            
-            document.getElementById('current-state').textContent = selectedState;
-            document.getElementById('max-tanks').textContent = `${data.maxTanques} B190/B125`;
-            
-            const distancesList = document.getElementById('distances-list');
-            distancesList.innerHTML = distanceLabels.map(item => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
-                    <div class="flex items-center">
-                        <span class="mr-3 text-lg">${item.icon}</span>
-                        <span class="text-sm font-medium text-gray-700">${item.label}</span>
-                    </div>
-                    <span class="font-bold text-blue-600">${data[item.key]}m</span>
-                </div>
-            `).join('');
-            
-            // Update state-specific warnings
-            const warningsContainer = document.getElementById('state-warnings');
-            warningsContainer.innerHTML = '';
-            
-            if (selectedState === 'MG') {
-                warningsContainer.innerHTML = `
-                    <div class="mt-2 p-3 bg-red-50 rounded border-l-4 border-red-500">
-                        <p class="text-sm font-medium text-red-800">⚠️ Atenção</p>
-                        <p class="text-sm text-red-700">Nicho não permitido em MG</p>
-                    </div>
-                `;
-            } else if (['PR', 'ES', 'MS', 'GO', 'PA'].includes(selectedState)) {
-                warningsContainer.innerHTML = `
-                    <div class="mt-2 p-3 bg-yellow-50 rounded border-l-4 border-yellow-500">
-                        <p class="text-sm font-medium text-yellow-800">📍 Restrição</p>
-                        <p class="text-sm text-yellow-700">Não permitido no corredor lateral, somente na fachada</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Initialize App
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('splash-screen').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-                updateDistances(); // Initialize distances data
-            }, 2000);
-        });
-
-        // Service Worker para PWA
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'ultragaz-v2';
-                const urlsToCache = ['/'];
-                
-                self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
-                });
-                
-                self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => response || fetch(event.request))
-                    );
-                });
-            `;
-            
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            
-            navigator.serviceWorker.register(swUrl)
-                .then(() => console.log('SW registrado'))
-                .catch(err => console.log('SW erro:', err));
-        }
-
-        // Prevent zoom on double-tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-    </script>
-
-    <!-- PWA Manifest inline -->
-    <script>
-        const manifest = {
-            name: "Ultragaz - Guia Técnico",
-            short_name: "Ultragaz",
-            description: "Guia de bolso para instalações comerciais de GLP",
-            start_url: "/",
-            display: "standalone",
-            background_color: "#2563eb",
-            theme_color: "#2563eb",
-            orientation: "portrait",
-            scope: "/",
-            icons: [
-                {
-                    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='20' fill='%232563eb'/%3E%3Ctext x='96' y='120' text-anchor='middle' font-size='80' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E",
-                    sizes: "192x192",
-                    type: "image/svg+xml",
-                    purpose: "any maskable"
-                },
-                {
-                    src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='50' fill='%232563eb'/%3E%3Ctext x='256' y='320' text-anchor='middle' font-size='200' font-weight='bold' fill='white'%3EUG%3C/text%3E%3C/svg%3E",
-                    sizes: "512x512",
-                    type: "image/svg+xml",
-                    purpose: "any maskable"
-                }
-            ]
-        };
-        
-        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-        const manifestURL = URL.createObjectURL(blob);
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = manifestURL;
-        document.head.appendChild(link);
-    </script>
-</body>
-</html>
+            consum<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Ultragaz</title>
+    
+    <!-- PWA Meta Tags para comportamento nativo -->
+    <meta name="description" content="Guia de bolso para instalações comerciais de GLP da Ultragaz">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ultragaz">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    
+    <!-- Manifest inline para máxima compatibilidade -->
+    <link id="manifest-placeholder" rel="manifest" href="#">
+    
+    <!-- Ícones -->
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJYSURBVFiFtZc9aBRBFMd/b2YTG1sLwcJCG1sLG9vYWNjYWFhYWNjYWFhYWNhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWNjYWNjYWNjYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWNjYWFhYWN
