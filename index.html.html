@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultragaz - Guia Técnico</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Guia de bolso para instalações comerciais de GLP da Ultragaz">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Ultragaz">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Ícone embutido como base64 -->
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iIzI1NjNlYiIvPgo8dGV4dCB4PSIxNiIgeT0iMjIiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE0IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5VRzwvdGV4dD4KPC9zdmc+">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Previne zoom em inputs no iOS */
+        input[type="text"], input[type="number"], select, textarea {
+            font-size: 16px;
+        }
+        
+        /* Estilo para scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2563eb;
+            border-radius: 2px;
+        }
+        
+        /* Animações */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Splash screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+        }
+        
+        .logo-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* PWA Install Button */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+            transform: translateY(100px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .install-prompt.show {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="logo-animation mb-4">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+                <span class="text-blue-600 text-2xl font-bold">UG</span>
+            </div>
+        </div>
+        <h1 class="text-2xl font-bold mb-2">Ultragaz</h1>
+        <p class="text-blue-200">Guia Técnico</p>
+        <div class="mt-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        </div>
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="install-prompt" class="install-prompt">
+        <div class="flex items-center justify-between">
+            <div class="flex-1">
+                <h3 class="font-semibold text-sm">📱 Instalar App</h3>
+                <p class="text-xs text-blue-200 mt-1">Adicione à tela inicial para acesso rápido</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="dismissInstall()" class="px-3 py-1 text-xs bg-blue-400 rounded">Depois</button>
+                <button onclick="installApp()" class="px-3 py-1 text-xs bg-white text-blue-600 rounded font-semibold">Instalar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div id="app" style="display: none;"></div>
+
+    <!-- React -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script>
+        // PWA Variables
+        let deferredPrompt;
+        let isInstalled = false;
+
+        // Check if app is already installed
+        window.addEventListener('appinstalled', () => {
+            isInstalled = true;
+            document.getElementById('install-prompt').style.display = 'none';
+        });
+
+        // Capture install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install prompt after app loads
+            setTimeout(() => {
+                if (!isInstalled) {
+                    document.getElementById('install-prompt').classList.add('show');
+                }
+            }, 3000);
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('App instalado!');
+                    }
+                    deferredPrompt = null;
+                    dismissInstall();
+                });
+            } else {
+                // Fallback para Safari/iOS
+                alert('Para instalar:\n\nSafari: Toque em Compartilhar → Adicionar à Tela de Início\nChrome: Menu → Adicionar à tela inicial');
+            }
+        }
+
+        function dismissInstall() {
+            document.getElementById('install-prompt').classList.remove('show');
+        }
+
+        // Service Worker (inline)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'ultragaz-v1';
+                    const urlsToCache = ['/'];
+                    
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => response || fetch(event.request))
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log('SW registrado'))
+                    .catch(err => console.log('SW erro:', err));
+            });
+        }
+
+        // React App
+        const { useState, createElement: h } = React;
+
+        // Dados dos vasilhames
+        const vasilhamesData = {
+            B190: {
+                diametro: '76,18 cm',
+                altura: '131,9 cm',
+                vazao: '03 kg/h',
+                taraMédia: '145 kg',
+                capacidadeGas: '190 kg',
+                capacidadeVolumetrica: '452 L'
+            },
+            B125: {
+                diametro: '61,0 cm',
+                altura: '133,7 cm',
+                vazao: '02,5 kg/h',
+                taraMédia: '100 kg',
+                capacidadeGas: '125 kg',
+                capacidadeVolumetrica: '300 L'
+            }
+        };
+
+        // Dados de distanciamento por estado
+        const distanciamentosNicho = {
+            'NBR 13523': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
+            'SP': { portas: 1.5, materiais: 1.5, ignição: 1.5, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
+            'RJ': { portas: 0, materiais: 0, ignição: 0, passeio: 0, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 2 },
+            'PR': { portas: 3, materiais: 3, ignição: 3, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
+            'ES': { portas: 1.5, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
+            'MS': { portas: 3, materiais: 3, ignição: 3, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
+            'GO': { portas: 0, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 },
+            'PA': { portas: 0, materiais: 0, ignição: 0, passeio: 0.8, chama: 6, captação: 6, produtos: 6, gerador: 6, outras: 7.5, maxTanques: 1 }
+        };
+
+        // Lista de aparelhos
+        const aparelhos = [
+            { nome: 'Fogão duas bocas (Portátil)', potencia: 2.9, consumo: 0.34 },
+            { nome: 'Fogão duas bocas (De bancada)', potencia: 3.6, consumo: 0.42 },
+            { nome: 'Fogão quatro bocas (Sem forno)', potencia: 8.1, consumo: 0.95 },
+            { nome: 'Fogão quatro bocas (Com forno)', potencia: 10.8, consumo: 1.27 },
+            { nome: 'Fogão cinco bocas (Sem forno)', potencia: 11.6, consumo: 1.36 },
+            { nome: 'Fogão cinco bocas (Com forno)', potencia: 15.6, consumo: 1.83 },
+            { nome: 'Fogão seis bocas (Sem forno)', potencia: 11.6, consumo: 1.36 },
+            { nome: 'Fogão seis bocas (Com forno)', potencia: 15.6, consumo: 1.83 },
+            { nome: 'Forno de parede', potencia: 3.5, consumo: 0.41 },
+            { nome: 'Fritadeira comercial', potencia: 12.8, consumo: 1.5 },
+            { nome: 'Aquecedor 6 L/min', potencia: 10.5, consumo: 1.23 },
+            { nome: 'Aquecedor 8 L/min', potencia: 14, consumo: 1.64 },
+            { nome: 'Aquecedor 10-12 L/min', potencia: 20.9, consumo: 2.45 },
+            { nome: 'Secadora de roupa', potencia: 7, consumo: 0.82 }
+        ];
+
+        function App() {
+            const [currentScreen, setCurrentScreen] = useState('home');
+            const [searchTerm, setSearchTerm] = useState('');
+
+            const Header = ({ title, showBack = false }) => h('div', 
+                { className: 'bg-blue-600 text-white p-4 flex items-center shadow-lg' },
+                showBack && h('button', {
+                    onClick: () => setCurrentScreen('home'),
+                    className: 'mr-3 p-1 hover:bg-blue-700 rounded text-xl'
+                }, '←'),
+                h('h1', { className: 'text-lg font-bold flex-1' }, title),
+                h('div', { className: 'w-8 h-8 bg-white rounded-full flex items-center justify-center' },
+                    h('span', { className: 'text-blue-600 text-xs font-bold' }, 'UG')
+                )
+            );
+
+            const SearchBar = () => h('div', { className: 'p-4 bg-gray-50' },
+                h('div', { className: 'relative' },
+                    h('span', { className: 'absolute left-3 top-3 text-gray-400' }, '🔍'),
+                    h('input', {
+                        type: 'text',
+                        placeholder: 'Buscar informações...',
+                        value: searchTerm,
+                        onChange: (e) => setSearchTerm(e.target.value),
+                        className: 'w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                    })
+                )
+            );
+
+            const HomeScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                Header({ title: 'Ultragaz - Guia Técnico' }),
+                SearchBar(),
+                h('div', { className: 'flex-1 p-4 space-y-4' },
+                    h('div', { className: 'grid grid-cols-2 gap-4' },
+                        h('button', {
+                            onClick: () => setCurrentScreen('vasilhames'),
+                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow'
+                        },
+                            h('div', { className: 'text-blue-600 mb-2 text-2xl' }, '🏗️'),
+                            h('h3', { className: 'font-semibold text-gray-800' }, 'Vasilhames'),
+                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'B190 e B125')
+                        ),
+                        h('button', {
+                            onClick: () => setCurrentScreen('calculator'),
+                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow'
+                        },
+                            h('div', { className: 'text-green-600 mb-2 text-2xl' }, '🧮'),
+                            h('h3', { className: 'font-semibold text-gray-800' }, 'Calculadora'),
+                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'Dimensionamento')
+                        ),
+                        h('button', {
+                            onClick: () => setCurrentScreen('distances'),
+                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 hover:shadow-lg transition-shadow'
+                        },
+                            h('div', { className: 'text-orange-600 mb-2 text-2xl' }, '📏'),
+                            h('h3', { className: 'font-semibold text-gray-800' }, 'Distâncias'),
+                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'Por estado')
+                        ),
+                        h('button', {
+                            onClick: () => setCurrentScreen('norms'),
+                            className: 'bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow'
+                        },
+                            h('div', { className: 'text-purple-600 mb-2 text-2xl' }, '📋'),
+                            h('h3', { className: 'font-semibold text-gray-800' }, 'Normas'),
+                            h('p', { className: 'text-sm text-gray-600 mt-1' }, 'NBR e ITs')
+                        )
+                    ),
+                    h('div', { className: 'bg-white rounded-lg shadow-md p-4 mt-6' },
+                        h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Acesso Rápido'),
+                        h('div', { className: 'space-y-2' },
+                            h('button', {
+                                onClick: () => setCurrentScreen('safety'),
+                                className: 'w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100'
+                            },
+                                h('span', { className: 'text-blue-600 font-medium' }, '⚠️ Segurança'),
+                                h('p', { className: 'text-sm text-gray-600' }, 'Procedimentos obrigatórios')
+                            ),
+                            h('button', {
+                                onClick: () => setCurrentScreen('investment'),
+                                className: 'w-full text-left p-3 hover:bg-gray-50 rounded border-b border-gray-100'
+                            },
+                                h('span', { className: 'text-green-600 font-medium' }, '💰 Investimento'),
+                                h('p', { className: 'text-sm text-gray-600' }, 'Análise de custos')
+                            ),
+                            h('button', {
+                                onClick: () => setCurrentScreen('faq'),
+                                className: 'w-full text-left p-3 hover:bg-gray-50 rounded'
+                            },
+                                h('span', { className: 'text-orange-600 font-medium' }, '❓ FAQ'),
+                                h('p', { className: 'text-sm text-gray-600' }, 'Dúvidas frequentes')
+                            )
+                        )
+                    )
+                )
+            );
+
+            const VasilhamesScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                Header({ title: 'Características dos Vasilhames', showBack: true }),
+                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
+                    Object.entries(vasilhamesData).map(([tipo, dados]) =>
+                        h('div', { key: tipo, className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('div', { className: 'flex items-center mb-4' },
+                                h('div', { className: 'w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3' },
+                                    h('span', { className: 'text-blue-600 font-bold text-lg' }, tipo)
+                                ),
+                                h('h3', { className: 'text-lg font-semibold text-gray-800' }, `Vasilhame ${tipo}`)
+                            ),
+                            h('div', { className: 'grid grid-cols-2 gap-4' },
+                                h('div', { className: 'space-y-3' },
+                                    h('div', {},
+                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Diâmetro'),
+                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.diametro)
+                                    ),
+                                    h('div', {},
+                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Altura'),
+                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.altura)
+                                    ),
+                                    h('div', {},
+                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Vazão'),
+                                        h('p', { className: 'text-lg font-semibold text-blue-600' }, dados.vazao)
+                                    )
+                                ),
+                                h('div', { className: 'space-y-3' },
+                                    h('div', {},
+                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Tara Média'),
+                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.taraMédia)
+                                    ),
+                                    h('div', {},
+                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Capacidade GLP'),
+                                        h('p', { className: 'text-lg font-semibold text-green-600' }, dados.capacidadeGas)
+                                    ),
+                                    h('div', {},
+                                        h('span', { className: 'text-sm font-medium text-gray-600' }, 'Cap. Volumétrica'),
+                                        h('p', { className: 'text-lg font-semibold text-gray-800' }, dados.capacidadeVolumetrica)
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    h('div', { className: 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded' },
+                        h('h4', { className: 'font-semibold text-blue-800 mb-2' }, '💡 Dica Importante'),
+                        h('p', { className: 'text-blue-700 text-sm' },
+                            'O B190 tem vazão de 3kg/h, ideal para estabelecimentos com maior consumo. Para dimensionamento correto, use a calculadora considerando o consumo total dos equipamentos.'
+                        )
+                    )
+                )
+            );
+
+            const CalculatorScreen = () => {
+                const [equipamentos, setEquipamentos] = useState([]);
+                const [horasUso, setHorasUso] = useState(8);
+                const [diasMes, setDiasMes] = useState(30);
+
+                const consumoTotal = equipamentos.reduce((total, eq) => total + eq.consumo, 0);
+                const consumoMensal = consumoTotal * horasUso * diasMes;
+                const tanquesNecessarios = Math.ceil(consumoTotal / 3);
+
+                const filteredAparelhos = aparelhos.filter(aparelho =>
+                    aparelho.nome.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+
+                return h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                    Header({ title: 'Calculadora de Dimensionamento', showBack: true }),
+                    h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
+                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Resultado do Dimensionamento'),
+                            h('div', { className: 'grid grid-cols-2 gap-4' },
+                                h('div', { className: 'text-center p-3 bg-blue-50 rounded' },
+                                    h('p', { className: 'text-2xl font-bold text-blue-600' }, consumoTotal.toFixed(1)),
+                                    h('p', { className: 'text-sm text-gray-600' }, 'kg/h Total')
+                                ),
+                                h('div', { className: 'text-center p-3 bg-green-50 rounded' },
+                                    h('p', { className: 'text-2xl font-bold text-green-600' }, tanquesNecessarios),
+                                    h('p', { className: 'text-sm text-gray-600' }, 'B190 Necessários')
+                                )
+                            ),
+                            h('div', { className: 'mt-3 p-3 bg-orange-50 rounded' },
+                                h('p', { className: 'text-sm text-orange-700' },
+                                    `Consumo mensal: ${consumoMensal.toFixed(0)} kg (${horasUso}h/dia × ${diasMes} dias)`
+                                )
+                            )
+                        ),
+                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Configurações de Uso'),
+                            h('div', { className: 'grid grid-cols-2 gap-4' },
+                                h('div', {},
+                                    h('label', { className: 'text-sm font-medium text-gray-600' }, 'Horas/dia'),
+                                    h('input', {
+                                        type: 'number',
+                                        value: horasUso,
+                                        onChange: (e) => setHorasUso(Number(e.target.value)),
+                                        className: 'w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
+                                    })
+                                ),
+                                h('div', {},
+                                    h('label', { className: 'text-sm font-medium text-gray-600' }, 'Dias/mês'),
+                                    h('input', {
+                                        type: 'number',
+                                        value: diasMes,
+                                        onChange: (e) => setDiasMes(Number(e.target.value)),
+                                        className: 'w-full mt-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
+                                    })
+                                )
+                            )
+                        ),
+                        equipamentos.length > 0 && h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Equipamentos Selecionados'),
+                            h('div', { className: 'space-y-2' },
+                                equipamentos.map((eq) =>
+                                    h('div', { key: eq.id, className: 'flex items-center justify-between p-2 bg-gray-50 rounded' },
+                                        h('div', {},
+                                            h('p', { className: 'font-medium text-sm' }, eq.nome),
+                                            h('p', { className: 'text-xs text-gray-600' }, `${eq.consumo} kg/h`)
+                                        ),
+                                        h('button', {
+                                            onClick: () => setEquipamentos(equipamentos.filter(item => item.id !== eq.id)),
+                                            className: 'text-blue-500 hover:text-blue-700 p-1'
+                                        }, '✕')
+                                    )
+                                )
+                            )
+                        ),
+                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Adicionar Equipamentos'),
+                            h('div', { className: 'relative mb-3' },
+                                h('span', { className: 'absolute left-3 top-3 text-gray-400' }, '🔍'),
+                                h('input', {
+                                    type: 'text',
+                                    placeholder: 'Buscar aparelho...',
+                                    value: searchTerm,
+                                    onChange: (e) => setSearchTerm(e.target.value),
+                                    className: 'w-full pl-9 pr-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500'
+                                })
+                            ),
+                            h('div', { className: 'space-y-2 max-h-60 overflow-y-auto' },
+                                filteredAparelhos.map((aparelho, index) =>
+                                    h('button', {
+                                        key: index,
+                                        onClick: () => setEquipamentos([...equipamentos, { ...aparelho, id: Date.now() }]),
+                                        className: 'w-full text-left p-3 hover:bg-gray-50 rounded border border-gray-200'
+                                    },
+                                        h('div', { className: 'flex justify-between items-center' },
+                                            h('div', {},
+                                                h('p', { className: 'font-medium text-sm' }, aparelho.nome),
+                                                h('p', { className: 'text-xs text-gray-600' }, `${aparelho.potencia} kW`)
+                                            ),
+                                            h('span', { className: 'text-blue-600 font-semibold' }, `${aparelho.consumo} kg/h`)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+
+            const DistancesScreen = () => {
+                const [selectedState, setSelectedState] = useState('NBR 13523');
+
+                return h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                    Header({ title: 'Distanciamentos - Central em Nicho', showBack: true }),
+                    h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
+                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Selecionar Estado/Norma'),
+                            h('select', {
+                                value: selectedState,
+                                onChange: (e) => setSelectedState(e.target.value),
+                                className: 'w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500'
+                            },
+                                Object.keys(distanciamentosNicho).map(state =>
+                                    h('option', { key: state, value: state }, state)
+                                )
+                            )
+                        ),
+                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('div', { className: 'flex items-center justify-between mb-4' },
+                                h('h3', { className: 'font-semibold text-gray-800' }, 'Distâncias Mínimas (metros)'),
+                                h('span', { className: 'bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm font-medium' },
+                                    selectedState
+                                )
+                            ),
+                            h('div', { className: 'space-y-3' },
+                                [
+                                    { key: 'portas', label: 'Portas e janelas', icon: '🚪' },
+                                    { key: 'materiais', label: 'Materiais combustíveis', icon: '📦' },
+                                    { key: 'ignição', label: 'Pontos de ignição', icon: '⚡' },
+                                    { key: 'passeio', label: 'Passeio público', icon: '🚶' },
+                                    { key: 'chama', label: 'Chama aberta', icon: '🔥' },
+                                    { key: 'captação', label: 'Captação de ar forçado', icon: '🌪️' },
+                                    { key: 'produtos', label: 'Produtos tóxicos/inflamáveis', icon: '☠️' },
+                                    { key: 'gerador', label: 'Gerador a diesel', icon: '⚙️' },
+                                    { key: 'outras', label: 'Outras centrais GLP', icon: '🏭' }
+                                ].map(item =>
+                                    h('div', { key: item.key, className: 'flex items-center justify-between p-3 bg-gray-50 rounded' },
+                                        h('div', { className: 'flex items-center' },
+                                            h('span', { className: 'mr-3 text-lg' }, item.icon),
+                                            h('span', { className: 'text-sm font-medium text-gray-700' }, item.label)
+                                        ),
+                                        h('span', { className: 'font-bold text-blue-600' },
+                                            `${distanciamentosNicho[selectedState][item.key]}m`
+                                        )
+                                    )
+                                )
+                            )
+                        ),
+                        h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('h3', { className: 'font-semibold text-gray-800 mb-3' }, 'Informações Específicas'),
+                            h('div', { className: 'p-3 bg-green-50 rounded' },
+                                h('p', { className: 'text-sm font-medium text-green-800' }, 'Máximo de tanques permitidos'),
+                                h('p', { className: 'text-lg font-bold text-green-600' },
+                                    `${distanciamentosNicho[selectedState].maxTanques} B190/B125`
+                                )
+                            ),
+                            selectedState === 'MG' && h('div', { className: 'mt-2 p-3 bg-red-50 rounded border-l-4 border-red-500' },
+                                h('p', { className: 'text-sm font-medium text-red-800' }, '⚠️ Atenção'),
+                                h('p', { className: 'text-sm text-red-700' }, 'Nicho não permitido em MG')
+                            ),
+                            ['PR', 'ES', 'MS', 'GO', 'PA'].includes(selectedState) && h('div', { className: 'mt-2 p-3 bg-yellow-50 rounded border-l-4 border-yellow-500' },
+                                h('p', { className: 'text-sm font-medium text-yellow-800' }, '📍 Restrição'),
+                                h('p', { className: 'text-sm text-yellow-700' },
+                                    'Não permitido no corredor lateral, somente na fachada'
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+
+            const NormsScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                Header({ title: 'Normas e Legislações', showBack: true }),
+                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
+                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                        h('h3', { className: 'font-semibold text-blue-600 mb-3' }, '📋 ABNT - Normas Técnicas'),
+                        h('div', { className: 'space-y-3' },
+                            [
+                                { codigo: 'NBR 13523', desc: 'Central de gás liquefeito de petróleo - GLP' },
+                                { codigo: 'NBR 14024', desc: 'Central de GLP - Sistema de abastecimento a granel' },
+                                { codigo: 'NBR 15358', desc: 'Rede de distribuição interna para uso não residencial' },
+                                { codigo: 'NBR 15526', desc: 'Redes de distribuição interna para instalações residenciais' }
+                            ].map((norma, index) =>
+                                h('div', { key: index, className: 'p-3 border border-gray-200 rounded-lg' },
+                                    h('p', { className: 'font-semibold text-gray-800' }, norma.codigo),
+                                    h('p', { className: 'text-sm text-gray-600' }, norma.desc)
+                                )
+                            )
+                        )
+                    ),
+                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                        h('h3', { className: 'font-semibold text-orange-600 mb-3' }, '🏛️ Legislações Federais'),
+                        h('div', { className: 'space-y-3' },
+                            [
+                                { codigo: 'ANP 18/2004', desc: 'Especificação do GLP' },
+                                { codigo: 'ANP 47/1999', desc: 'Sistema de Abastecimento de GLP à granel' },
+                                { codigo: 'ANP 49/2016', desc: 'Distribuidoras de GLP' },
+                                { codigo: 'NRs', desc: 'Normas Regulamentadoras - Ministério do Trabalho' }
+                            ].map((lei, index) =>
+                                h('div', { key: index, className: 'p-3 border border-gray-200 rounded-lg' },
+                                    h('p', { className: 'font-semibold text-gray-800' }, lei.codigo),
+                                    h('p', { className: 'text-sm text-gray-600' }, lei.desc)
+                                )
+                            )
+                        )
+                    ),
+                    h('div', { className: 'bg-blue-50 border-l-4 border-blue-500 p-4 rounded' },
+                        h('h4', { className: 'font-semibold text-blue-800 mb-2' }, '⚠️ Hierarquia de Normas'),
+                        h('p', { className: 'text-blue-700 text-sm' },
+                            'Prioridade: 1º Instruções do Corpo de Bombeiros, 2º Procedimentos Ultragaz, 3º NBRs'
+                        )
+                    )
+                )
+            );
+
+            const SafetyScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                Header({ title: 'Segurança - Procedimentos', showBack: true }),
+                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
+                    h('div', { className: 'bg-blue-600 text-white rounded-lg p-4' },
+                        h('h3', { className: 'font-bold text-lg mb-2' }, '🛡️ SEGURANÇA COMO VALOR PRIMORDIAL'),
+                        h('p', { className: 'text-sm' },
+                            'A instalação em conformidade com as normas vigentes minimiza riscos e garante a segurança das instalações.'
+                        )
+                    ),
+                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                        h('h3', { className: 'font-semibold text-blue-600 mb-3' }, '⚠️ Riscos de Não Conformidade'),
+                        h('div', { className: 'space-y-3' },
+                            [
+                                { icon: '💥', text: 'Risco de acidentes' },
+                                { icon: '🚫', text: 'Risco de não pagamento do seguro em caso de acidente' },
+                                { icon: '🚨', text: 'Risco de interdição pelo Corpo de Bombeiros' },
+                                { icon: '⛔', text: 'Risco de não abastecimento pela Logística' }
+                            ].map((risco, index) =>
+                                h('div', { key: index, className: 'flex items-center p-3 bg-blue-50 rounded border-l-4 border-blue-500' },
+                                    h('span', { className: 'text-xl mr-3' }, risco.icon),
+                                    h('span', { className: 'text-blue-700 font-medium' }, risco.text)
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+
+            const InvestmentScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                Header({ title: 'Análise de Investimento', showBack: true }),
+                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
+                    h('div', { className: 'bg-blue-600 text-white rounded-lg p-4' },
+                        h('h3', { className: 'font-bold text-lg mb-2' }, '💰 Composição do Investimento'),
+                        h('p', { className: 'text-sm' },
+                            'Para geração dos valores da OS, os kits devem ser lançados corretamente no Salesforce.'
+                        )
+                    ),
+                    h('div', { className: 'bg-white rounded-lg shadow-md p-4' },
+                        h('h3', { className: 'font-semibold text-gray-800 mb-3' }, '📦 Kits Principais'),
+                        h('div', { className: 'space-y-3' },
+                            [
+                                'Kit Central: Projeto + Material + Mão de obra + Frete + Residual',
+                                'Kit Rede Completo: Material e mão de obra por metro',
+                                'Kit Abrigo Completo: Abrigo pré-moldado + montagem',
+                                'Kit Interligação: Material para ponto de consumo',
+                                'Kit km Entrega: Transporte por km (Munck)'
+                            ].map((kit, index) =>
+                                h('div', { key: index, className: 'p-3 border border-gray-200 rounded-lg' },
+                                    h('p', { className: 'font-medium text-blue-600' }, kit)
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+
+            const FAQScreen = () => h('div', { className: 'flex flex-col h-screen bg-gray-50' },
+                Header({ title: 'Dúvidas Frequentes', showBack: true }),
+                h('div', { className: 'flex-1 overflow-y-auto p-4 space-y-4' },
+                    [
+                        {
+                            pergunta: "Pode ser finalizada uma instalação com OS parcialmente aprovada?",
+                            resposta: "Não. Neste status não é possível realizar pagamento dos prestadores nem existe Base Instalada para NF de comodato."
+                        },
+                        {
+                            pergunta: "Quais condições obrigatórias para montagem?",
+                            resposta: "OS deve estar 'Aprovada' no Oracle PM, Projeto/croqui validado tecnicamente e OS com saldo suficiente."
+                        },
+                        {
+                            pergunta: "Posso solicitar visita de projeto sem OS?",
+                            resposta: "Sim, é possível. Porém, caso o negócio não seja fechado, o custo será lançado em despesa comercial."
+                        }
+                    ].map((faq, index) =>
+                        h('div', { key: index, className: 'bg-white rounded-lg shadow-md p-4' },
+                            h('details', { className: 'group' },
+                                h('summary', { className: 'flex justify-between items-center cursor-pointer' },
+                                    h('h3', { className: 'font-semibold text-gray-800 pr-4' }, faq.pergunta),
+                                    h('span', { className: 'text-blue-600 group-open:rotate-180 transition-transform' }, '▼')
+                                ),
+                                h('div', { className: 'mt-3 pt-3 border-t border-gray-100' },
+                                    h('p', { className: 'text-gray-700 text-sm leading-relaxed' }, faq.resposta)
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+
+            const BottomNav = () => h('div', { className: 'bg-white border-t border-gray-200 px-4 py-2' },
+                h('div', { className: 'flex justify-around' },
+                    h('button', {
+                        onClick: () => setCurrentScreen('home'),
+                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'home' ? 'text-blue-600' : 'text-gray-400'}`
+                    },
+                        h('div', { className: 'text-xl' }, '🏠'),
+                        h('span', { className: 'text-xs mt-1' }, 'Início')
+                    ),
+                    h('button', {
+                        onClick: () => setCurrentScreen('calculator'),
+                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'calculator' ? 'text-blue-600' : 'text-gray-400'}`
+                    },
+                        h('div', { className: 'text-xl' }, '🧮'),
+                        h('span', { className: 'text-xs mt-1' }, 'Calc')
+                    ),
+                    h('button', {
+                        onClick: () => setCurrentScreen('distances'),
+                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'distances' ? 'text-blue-600' : 'text-gray-400'}`
+                    },
+                        h('div', { className: 'text-xl' }, '📏'),
+                        h('span', { className: 'text-xs mt-1' }, 'Dist.')
+                    ),
+                    h('button', {
+                        onClick: () => setCurrentScreen('norms'),
+                        className: `flex flex-col items-center py-2 px-3 rounded ${currentScreen === 'norms' ? 'text-blue-600' : 'text-gray-400'}`
+                    },
+                        h('div', { className: 'text-xl' }, '📋'),
+                        h('span', { className: 'text-xs mt-1' }, 'Normas')
+                    )
+                )
+            );
+
+            const renderScreen = () => {
+                switch (currentScreen) {
+                    case 'home': return HomeScreen();
+                    case 'vasilhames': return VasilhamesScreen();
+                    case 'calculator': return CalculatorScreen();
+                    case 'distances': return DistancesScreen();
+                    case 'norms': return NormsScreen();
+                    case 'safety': return SafetyScreen();
+                    case 'investment': return InvestmentScreen();
+                    case 'faq': return FAQScreen();
+                    default: return HomeScreen();
+                }
+            };
+
+            return h('div', { className: 'max-w-md mx-auto bg-white min-h-screen flex flex-col' },
+                renderScreen(),
+                BottomNav()
+            );
+        }
+
+        // Hide Splash and Show App
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('splash-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                // Render React App
+                ReactDOM.render(React.createElement(App), document.getElementById('app'));
+            }, 2000);
+        });
+
+        // Prevent zoom on double-tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
